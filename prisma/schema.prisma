@@ -1,0 +1,575 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ADMIN & AUTHENTICATION
+// ============================================================
+
+enum AdminRole {
+  SUPER_ADMIN   // Full platform access + admin user management
+  ADMIN         // Full content + orders + reports; cannot manage admin users
+  MANAGER       // Orders, customers, inventory, reports; no content editing; no settings
+  STAFF         // Orders + customers (read/update only); no reports; no content
+}
+
+model AdminUser {
+  id                  String               @id @default(uuid())
+  name                String
+  email               String               @unique
+  passwordHash        String
+  role                AdminRole            @default(STAFF)
+  isActive            Boolean              @default(true)
+  refreshToken        String?
+  permissions         Json?                // Granular overrides beyond role defaults
+  lastLoginAt         DateTime?
+  passwordResetTokens AdminPasswordReset[]
+  auditLogs           AuditLog[]
+  assignedOrders      Order[]              @relation("OrderAssignment")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model AdminPasswordReset {
+  id         String    @id @default(uuid())
+  userId     String
+  user       AdminUser @relation(fields: [userId], references: [id])
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  LOGIN_FAILED
+  PASSWORD_CHANGED
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
+  EXPORT
+  PUBLISH
+  UNPUBLISH
+  STOCK_ADJUSTMENT
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  adminUserId String?
+  admin       AdminUser?  @relation(fields: [adminUserId], references: [id])
+  action      AuditAction
+  entityType  String?     // "Product", "Order", "Customer", etc.
+  entityId    String?
+  before      Json?       // State before the action
+  after       Json?       // State after the action
+  note        String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  @@index([adminUserId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ============================================================
+// IN-APP NOTIFICATIONS
+// ============================================================
+
+enum NotificationType {
+  ORDER_RECEIVED
+  LOW_STOCK
+  NEW_REVIEW
+  STOCK_ADJUSTED
+  ORDER_STATUS_CHANGED
+  SYSTEM
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  adminUserId String?          // null = broadcast to all admins
+  type        NotificationType
+  title       String
+  body        String
+  entityType  String?
+  entityId    String?
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@index([adminUserId, isRead])
+  @@index([createdAt])
+}
+
+// ============================================================
+// PRODUCT TAXONOMY
+// ============================================================
+
+model ProductCategory {
+  id            String        @id @default(uuid())
+  slug          String        @unique
+  name          String
+  image         String?
+  bannerImage   String?
+  bannerTagline String?
+  sortOrder     Int           @default(0)
+  isPublished   Boolean       @default(true)
+  subcategories Subcategory[]
+  products      Product[]
+  seo           CategorySEO?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model CategorySEO {
+  id              String          @id @default(uuid())
+  categoryId      String          @unique
+  category        ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  ogImageUrl      String?
+}
+
+model Subcategory {
+  id          String          @id @default(uuid())
+  slug        String          @unique
+  name        String
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  sortOrder   Int             @default(0)
+  isPublished Boolean         @default(true)
+  products    Product[]
+  seo         SubcategorySEO?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model SubcategorySEO {
+  id              String      @id @default(uuid())
+  subcategoryId   String      @unique
+  subcategory     Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  seoHeading      String?
+  seoIntro        String?     @db.Text
+  seoSections     Json?       // [{ title: string; body: string }]
+  whyUs           Json?       // [{ title: string; body: string }]
+  closingTitle    String?
+  closing         String?     @db.Text
+  faqs            Json?       // [{ q: string; a: string }]
+  ogImageUrl      String?
+}
+
+// ============================================================
+// PRODUCT CATALOG
+// ============================================================
+
+model Product {
+  id               String           @id @default(uuid())
+  slug             String           @unique
+  name             String
+  sku              String?          @unique
+  categoryId       String
+  category         ProductCategory  @relation(fields: [categoryId], references: [id])
+  subcategoryId    String?
+  subcategory      Subcategory?     @relation(fields: [subcategoryId], references: [id])
+  price            Decimal          @db.Decimal(10, 2)
+  originalPrice    Decimal?         @db.Decimal(10, 2)
+  description      String?          @db.Text
+  shortDescription String?
+  isPublished      Boolean          @default(false)
+  inStock          Boolean          @default(true)
+  isMadeToOrder    Boolean          @default(false)
+  netWeightGrams   Decimal?         @db.Decimal(6, 2)
+  totalDiamondCt   Decimal?         @db.Decimal(6, 3)
+  totalDiamondPcs  Int?
+  diamondGrade     String?          // e.g. "EF VVS-VS"
+  images           ProductImage[]
+  variants         ProductVariant[]
+  inventory        InventoryItem[]
+  orderItems       OrderItem[]
+  seo              ProductSEO?
+  sortOrder        Int              @default(0)
+  deletedAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+  isHover   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ProductVariant {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  metalFinish String   // "Yellow Gold", "White Gold", "Rose Gold"
+  swatchColor String?  // hex e.g. "#E6C158"
+  priceOffset Decimal? @db.Decimal(10, 2)
+  isDefault   Boolean  @default(false)
+  inStock     Boolean  @default(true)
+}
+
+model ProductSEO {
+  id              String  @id @default(uuid())
+  productId       String  @unique
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  ogImageUrl      String?
+}
+
+// ============================================================
+// INVENTORY
+// ============================================================
+
+enum StockMovementType {
+  RESTOCK
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
+model InventoryItem {
+  id           String          @id @default(uuid())
+  productId    String
+  product      Product         @relation(fields: [productId], references: [id])
+  variantId    String?
+  quantity     Int             @default(0)
+  reorderLevel Int             @default(0)
+  movements    StockMovement[]
+  updatedAt    DateTime        @updatedAt
+}
+
+model StockMovement {
+  id              String            @id @default(uuid())
+  inventoryItemId String
+  inventoryItem   InventoryItem     @relation(fields: [inventoryItemId], references: [id])
+  type            StockMovementType
+  quantity        Int               // positive = in, negative = out
+  reason          String?
+  adminUserId     String?
+  createdAt       DateTime          @default(now())
+
+  @@index([inventoryItemId, createdAt])
+}
+
+// ============================================================
+// ORDERS & CUSTOMERS
+// ============================================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PRODUCTION
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum OrderChannel {
+  WHATSAPP
+  WEBSITE
+  PHONE
+  WALK_IN
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+enum CustomerSource {
+  WHATSAPP
+  WEBSITE
+  WALK_IN
+  PHONE
+  REFERRAL
+}
+
+model Customer {
+  id              String            @id @default(uuid())
+  name            String
+  email           String?
+  phone           String?
+  whatsapp        String?
+  source          CustomerSource?
+  tags            String[]          // e.g. ["VIP", "Repeat Buyer"]
+  notes           String?           @db.Text
+  totalOrderValue Decimal           @db.Decimal(12, 2) @default(0)
+  orderCount      Int               @default(0)
+  addresses       CustomerAddress[]
+  orders          Order[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([phone])
+  @@index([email])
+}
+
+model CustomerAddress {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  label      String?  // "Home", "Work"
+  line1      String
+  line2      String?
+  city       String
+  state      String?
+  pincode    String
+  country    String   @default("India")
+  isDefault  Boolean  @default(false)
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique   // "HOS-2026-0001"
+  customerId      String
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  assignedToId    String?
+  assignedTo      AdminUser?    @relation("OrderAssignment", fields: [assignedToId], references: [id])
+  status          OrderStatus   @default(PENDING)
+  channel         OrderChannel  @default(WHATSAPP)
+  items           OrderItem[]
+  shippingAddress Json?         // address snapshot at order time
+  subtotal        Decimal       @db.Decimal(10, 2)
+  tax             Decimal       @db.Decimal(10, 2) @default(0)
+  discount        Decimal       @db.Decimal(10, 2) @default(0)
+  total           Decimal       @db.Decimal(10, 2)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  paymentMethod   String?
+  internalNotes   String?       @db.Text
+  customerNote    String?       @db.Text
+  trackingNumber  String?
+  courier         String?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  timeline        Json?         // [{ status, timestamp, note, adminId }]
+  deletedAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status])
+  @@index([customerId])
+  @@index([createdAt])
+  @@index([channel])
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  variantId   String?
+  productName String  // snapshot of name at order time
+  quantity    Int
+  unitPrice   Decimal @db.Decimal(10, 2)
+  lineTotal   Decimal @db.Decimal(10, 2)
+  metalFinish String?
+  notes       String?
+}
+
+// ============================================================
+// WEBSITE CONTENT (CMS MODULE)
+// ============================================================
+
+model HeroSlide {
+  id        String   @id @default(uuid())
+  image     String
+  tagline   String?
+  title     String
+  cta       String?
+  href      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id          String    @id @default(uuid())
+  name        String
+  location    String?
+  quote       String    @db.Text
+  imageUrl    String?
+  rating      Int       // 1-5
+  productName String?
+  productId   String?
+  verified    Boolean   @default(false)
+  isPublished Boolean   @default(false)
+  reviewDate  DateTime?
+  source      String?   // "Google", "WhatsApp", "Direct"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BlogCategory {
+  id    String     @id @default(uuid())
+  name  String
+  slug  String     @unique
+  posts BlogPost[]
+}
+
+model BlogPost {
+  id          String        @id @default(uuid())
+  slug        String        @unique
+  title       String
+  excerpt     String?
+  body        String?       @db.Text
+  sections    Json?         // structured long-form sections array
+  imageUrl    String?
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  isPublished Boolean       @default(false)
+  publishedAt DateTime?
+  seo         BlogPostSEO?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model BlogPostSEO {
+  id              String   @id @default(uuid())
+  blogPostId      String   @unique
+  blogPost        BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  ogImageUrl      String?
+}
+
+enum FAQContext {
+  GENERAL
+  PRODUCT
+  DIAMOND_EDUCATION
+  CUSTOMISE
+  GIFTING
+  COLLECTION
+}
+
+model FAQCategory {
+  id        String @id @default(uuid())
+  name      String
+  sortOrder Int    @default(0)
+  faqs      FAQ[]
+}
+
+model FAQ {
+  id          String      @id @default(uuid())
+  categoryId  String
+  category    FAQCategory @relation(fields: [categoryId], references: [id])
+  question    String
+  answer      String      @db.Text
+  context     FAQContext  @default(GENERAL)
+  sortOrder   Int         @default(0)
+  isPublished Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Page {
+  id          String   @id @default(uuid())
+  // slugs: "about", "diamond-education", "gold-vermeil", "gifting", "customise"
+  slug        String   @unique
+  title       String
+  content     Json     // Full structured content matching current mock.js page shapes
+  isPublished Boolean  @default(false)
+  seo         PageSEO?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PageSEO {
+  id              String  @id @default(uuid())
+  pageId          String  @unique
+  page            Page    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  metaTitle       String?
+  metaDescription String?
+  ogImageUrl      String?
+}
+
+// ============================================================
+// NAVIGATION & SITE SETTINGS
+// ============================================================
+
+model NavigationItem {
+  id        String           @id @default(uuid())
+  label     String
+  href      String
+  parentId  String?
+  parent    NavigationItem?  @relation("NavChildren", fields: [parentId], references: [id])
+  children  NavigationItem[] @relation("NavChildren")
+  sortOrder Int              @default(0)
+  isActive  Boolean          @default(true)
+}
+
+// Singleton row — always id = "singleton"
+model SiteSettings {
+  id                    String   @id @default("singleton")
+  whatsappNumber        String
+  contactEmail          String?
+  contactPhone          String?
+  instagramUrl          String?
+  facebookUrl           String?
+  youtubeUrl            String?
+  footerTagline         String?
+  footerCopyright       String?
+  announcementMessages  Json     // string[]
+  promises              Json     // string[]
+  pressNames            Json     // string[]
+  heroTiles             Json?    // [{ title, cta, image, href }]
+  diamondSectionImage   String?
+  diamondSectionVideo   String?
+  diamondSectionHeading String?
+  diamondSectionBody    String?
+  productPromises       Json?    // [{ label: string }]
+  shippingFAQ           Json?    // orders & shipments accordion content
+  returnPolicyCards     Json?    // returns policy cards
+  footerSections        Json?    // [{ heading, links[] }]
+  freeShippingThreshold Decimal? @db.Decimal(10, 2)
+  updatedAt             DateTime @updatedAt
+}
+
+// ============================================================
+// MEDIA LIBRARY
+// ============================================================
+
+model MediaAsset {
+  id           String   @id @default(uuid())
+  filename     String   // Generated UUID-based filename, e.g. "a1b2c3d4.webp"
+  originalName String   // Original upload filename (stored for reference only)
+  mimeType     String
+  sizeBytes    Int
+  path         String   // Server-side filesystem path, e.g. "/var/www/.../uploads/products/a1b2c3d4.webp"
+  url          String   // Public URL, e.g. "https://houseofseya.com/uploads/products/a1b2c3d4.webp"
+  folder       String?  // "products", "collections", "blogs", "pages", "homepage", "general"
+  width        Int?
+  height       Int?
+  altText      String?
+  uploadedBy   String   // AdminUser.id
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
