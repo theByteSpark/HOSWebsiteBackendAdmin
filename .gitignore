@@ -44,7 +44,7 @@ prisma/*.log
 # Runtime uploaded media
 uploads/
 storage/
-media/
+/media/
 public/uploads/
 public/media/
 

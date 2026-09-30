@@ -10,9 +10,33 @@ import { Button } from '@/components/ui/Button';
 import { ProductEditorModal } from './ProductEditorModal';
 import { formatCurrency, formatDate } from '@/lib/format';
 import type { Product, ProductCategory } from '@/types';
-import { Plus, Gem, Check, Eye } from 'lucide-react';
+import { Plus, Gem, Check, Eye, Loader2 } from 'lucide-react';
 
 import { ConfirmDialog } from '@/components/ui/Modal';
+
+// Thumbnail cell — shows a spinner until the image loads, Gem icon on failure
+const ProductThumb: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-graphite-100 overflow-hidden border border-graphite-200">
+      {failed ? (
+        <Gem className="h-4 w-4 text-graphite-400" />
+      ) : (
+        <>
+          {!loaded && <Loader2 className="absolute h-3.5 w-3.5 animate-spin text-graphite-400" />}
+          <img
+            src={src}
+            alt={alt}
+            onLoad={() => setLoaded(true)}
+            onError={() => setFailed(true)}
+            className={`h-full w-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          />
+        </>
+      )}
+    </div>
+  );
+};
 
 export const ProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -90,21 +114,23 @@ export const ProductsPage: React.FC = () => {
       accessor: (row) => {
         // Find primary image: Yellow Gold primary → any Yellow Gold → any variant primary → first image
         const ygVariant = row.variants?.find(v => v.metalFinish === 'Yellow Gold');
+        const pick = (img?: { url: string; thumbnailUrl?: string | null } | null) =>
+          img ? (img.thumbnailUrl || img.url) : null;
         const primaryImg =
-          ygVariant?.images?.find(i => i.isPrimary)?.url ||
-          ygVariant?.images?.[0]?.url ||
-          row.variants?.flatMap(v => v.images || []).find(i => i.isPrimary)?.url ||
-          row.variants?.flatMap(v => v.images || [])[0]?.url ||
-          row.images?.[0]?.url || null;
+          pick(ygVariant?.images?.find(i => i.isPrimary)) ||
+          pick(ygVariant?.images?.[0]) ||
+          pick(row.variants?.flatMap(v => v.images || []).find(i => i.isPrimary)) ||
+          pick(row.variants?.flatMap(v => v.images || [])[0]) ||
+          pick(row.images?.[0]) || null;
         return (
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-graphite-100 overflow-hidden border border-graphite-200">
-            {primaryImg ? (
-              <img src={primaryImg} alt={row.name} className="h-full w-full object-cover" />
-            ) : (
+          {primaryImg ? (
+            <ProductThumb key={primaryImg} src={primaryImg} alt={row.name} />
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-graphite-100 overflow-hidden border border-graphite-200">
               <Gem className="h-4 w-4 text-graphite-400" />
-            )}
-          </div>
+            </div>
+          )}
           <div>
             <p className="font-bold text-graphite-900">{row.name}</p>
             <p className="text-xs text-graphite-400">SKU: {row.sku || '—'}</p>

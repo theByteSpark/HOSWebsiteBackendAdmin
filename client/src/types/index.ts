@@ -141,6 +141,7 @@ export interface ProductImage {
   id: string;
   productId: string;
   url: string;
+  thumbnailUrl?: string | null;
   altText?: string | null;
   sortOrder: number;
   isHover: boolean;
@@ -150,6 +151,7 @@ export interface VariantImage {
   id: string;
   variantId: string;
   url: string;
+  thumbnailUrl?: string | null;
   altText?: string | null;
   sortOrder: number;
   isPrimary: boolean;
@@ -347,6 +349,7 @@ export interface MediaAsset {
   sizeBytes: number;
   path: string;
   url: string;
+  thumbnailUrl?: string | null;
   folder?: string | null;
   altText?: string | null;
   createdAt: string;

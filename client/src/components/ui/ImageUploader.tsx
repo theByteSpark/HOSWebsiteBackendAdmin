@@ -23,6 +23,7 @@ import {
   isRatioCorrect,
   meetsMinResolution,
 } from '@/lib/imageUploadConfig';
+import { thumbnailFor } from '@/lib/imageUrl';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -76,6 +77,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [cropFile, setCropFile] = useState<File | null>(null);
   const [showCropper, setShowCropper] = useState(false);
 
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const config = uploadContext ? IMAGE_UPLOAD_CONFIGS[uploadContext] : null;
@@ -90,18 +92,21 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      // 'folder' must precede 'file' — multer's destination cb reads req.body.folder when the file part arrives
       formData.append('folder', folder);
       if (uploadContext) {
         formData.append('uploadContext', uploadContext);
       }
+      formData.append('file', file);
 
       const res = await apiClient.post('/media/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      const uploadedUrl = res.data.data?.url || res.data?.url;
+      const payload = res.data.data || res.data;
+      const uploadedUrl = payload?.url;
       if (uploadedUrl) {
+        setThumbUrl(payload.thumbnailUrl || thumbnailFor(uploadedUrl));
         onChange(uploadedUrl);
       } else {
         setError('Upload succeeded but no URL was returned. Please try again.');
@@ -236,7 +241,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         {value ? (
           <div className="relative rounded-xl border border-graphite-200 bg-graphite-50 p-3 flex items-center gap-4 group">
             <div className="h-20 w-28 rounded-lg bg-graphite-200 overflow-hidden border border-graphite-300 shrink-0 relative">
-              <img src={value} alt={label} className="h-full w-full object-cover" />
+              <img
+                src={thumbUrl || thumbnailFor(value) || value}
+                alt={label}
+                className="h-full w-full object-cover"
+                onError={(e) => { if (e.currentTarget.src !== value) e.currentTarget.src = value; }}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-graphite-900 truncate">

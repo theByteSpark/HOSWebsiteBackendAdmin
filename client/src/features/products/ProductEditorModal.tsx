@@ -110,16 +110,16 @@ function uid() {
 
 // ── Image upload helper ────────────────────────────────────────────────────
 
-async function uploadFileToMedia(file: File): Promise<string> {
+async function uploadFileToMedia(file: File): Promise<{ url: string; thumbnailUrl: string | null }> {
   const formData = new FormData();
+  formData.append('folder', 'products'); // must precede 'file' — multer's destination cb reads req.body.folder when the file part arrives
   formData.append('file', file);
-  formData.append('folder', 'products');
   const res = await apiClient.post('/media/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  const url = res.data.data?.url || res.data?.url;
-  if (!url) throw new Error('Upload returned no URL');
-  return url;
+  const payload = res.data.data || res.data;
+  if (!payload?.url) throw new Error('Upload returned no URL');
+  return { url: payload.url, thumbnailUrl: payload.thumbnailUrl || null };
 }
 
 // ── Variant Image Panel (edit mode — live) ─────────────────────────────────
@@ -160,9 +160,10 @@ const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productI
 
   // Upload a single already-validated / cropped file to the server
   const doUploadSingleFile = async (file: File, order: number, isPrimary: boolean) => {
-    const url = await uploadFileToMedia(file);
+    const { url, thumbnailUrl } = await uploadFileToMedia(file);
     await apiClient.post(`/products/variants/${section.variantId}/images`, {
       url,
+      thumbnailUrl,
       altText: `${section.metalFinish} view ${order + 1}`,
       sortOrder: order,
       isPrimary,
@@ -333,7 +334,7 @@ const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productI
               <div key={img.id} className="relative group w-24 rounded-lg overflow-hidden border border-graphite-200 bg-graphite-50 flex-shrink-0">
                 {/* Image */}
                 <div className="aspect-square w-full overflow-hidden">
-                  <img src={img.url} alt={img.altText || ''} className="w-full h-full object-cover" />
+                  <img src={img.thumbnailUrl || img.url} alt={img.altText || ''} className="w-full h-full object-cover" />
                 </div>
 
                 {/* Primary badge */}
@@ -738,9 +739,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             setSaveStep(`Uploading ${s.metalFinish} images…`);
             for (let i = 0; i < s.pendingImages.length; i++) {
               const p = s.pendingImages[i];
-              const url = await uploadFileToMedia(p.file);
+              const { url, thumbnailUrl } = await uploadFileToMedia(p.file);
               await apiClient.post(`/products/variants/${variantId}/images`, {
                 url,
+                thumbnailUrl,
                 altText: `${s.metalFinish} view ${i + 1}`,
                 sortOrder: i,
                 isPrimary: i === 0,

@@ -180,6 +180,13 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       counter++;
     }
 
+    if (sku) {
+      const existingSku = await prisma.product.findUnique({ where: { sku } });
+      if (existingSku) {
+        return sendError(res, 'Product SKU already exists', 400);
+      }
+    }
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -308,6 +315,13 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
           : null;
     }
 
+    if (slug && slug !== existing.slug) {
+      const slugOwner = await prisma.product.findUnique({ where: { slug } });
+      if (slugOwner) {
+        return sendError(res, 'Product slug already exists', 400);
+      }
+    }
+
     if (images && Array.isArray(images)) {
       await prisma.productImage.deleteMany({ where: { productId: id } });
       if (images.length > 0) {
@@ -315,6 +329,7 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
           data: images.map((img: any, idx: number) => ({
             productId: id,
             url: img.url,
+            thumbnailUrl: img.thumbnailUrl || null,
             altText: img.altText || null,
             sortOrder: img.sortOrder !== undefined ? img.sortOrder : idx,
             isHover: Boolean(img.isHover),
@@ -563,7 +578,7 @@ export const deleteVariant = async (req: AuthenticatedRequest, res: Response) =>
 export const addVariantImage = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const variantId = String(req.params.variantId);
-    const { url, altText, sortOrder, isPrimary } = req.body;
+    const { url, thumbnailUrl, altText, sortOrder, isPrimary } = req.body;
 
     if (!url) return sendError(res, 'url is required', 400);
 
@@ -589,7 +604,7 @@ export const addVariantImage = async (req: AuthenticatedRequest, res: Response) 
     }
 
     const image = await prisma.variantImage.create({
-      data: { variantId, url, altText, sortOrder: sortOrder ?? 0, isPrimary: isPrimary || false },
+      data: { variantId, url, thumbnailUrl: thumbnailUrl || null, altText, sortOrder: sortOrder ?? 0, isPrimary: isPrimary || false },
     });
 
     await logAudit({

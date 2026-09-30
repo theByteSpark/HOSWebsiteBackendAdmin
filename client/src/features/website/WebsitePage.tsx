@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { ImageUploader } from '@/components/ui/ImageUploader';
 import { formatDate } from '@/lib/format';
+import { thumbnailFor } from '@/lib/imageUrl';
 import type { HeroSlide, Review, BlogPost, FAQ, MediaAsset, ProductCategory, Subcategory } from '@/types';
 import {
   Globe,
@@ -553,7 +554,12 @@ export const WebsitePage: React.FC = () => {
 
                   {cat.image && (
                     <div className="h-28 w-full rounded-lg bg-graphite-100 overflow-hidden border border-graphite-100">
-                      <img src={cat.image} alt={cat.name} className="h-full w-full object-cover" />
+                      <img
+                        src={thumbnailFor(cat.image) || cat.image}
+                        alt={cat.name}
+                        className="h-full w-full object-cover"
+                        onError={(e) => { if (e.currentTarget.src !== cat.image) e.currentTarget.src = cat.image!; }}
+                      />
                     </div>
                   )}
 
@@ -819,7 +825,12 @@ const HomePageEditor: React.FC<{
             heroSlides.map((slide) => (
               <div key={slide.id} className="rounded-xl border border-graphite-200 bg-white p-4 space-y-3 flex items-start gap-4 shadow-2xs">
                 <div className="h-20 w-32 rounded-lg bg-graphite-100 overflow-hidden shrink-0 border border-graphite-200">
-                  <img src={slide.image} alt={slide.title} className="h-full w-full object-cover" />
+                  <img
+                    src={thumbnailFor(slide.image) || slide.image}
+                    alt={slide.title}
+                    className="h-full w-full object-cover"
+                    onError={(e) => { if (e.currentTarget.src !== slide.image) e.currentTarget.src = slide.image; }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-graphite-900 text-sm truncate">{slide.title}</p>

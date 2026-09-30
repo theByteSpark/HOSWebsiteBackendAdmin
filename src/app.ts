@@ -11,6 +11,10 @@ import { apiRateLimiter } from './middleware/rateLimiter.middleware';
 
 const app = express();
 
+// Behind Nginx reverse proxy — trust first hop so req.ip / express-rate-limit
+// use X-Forwarded-For correctly (must be set before rate limiter runs)
+app.set('trust proxy', 1);
+
 // Security & Headers
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({

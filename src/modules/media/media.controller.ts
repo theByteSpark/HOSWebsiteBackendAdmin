@@ -32,6 +32,32 @@ const CONTEXT_RATIOS: Record<string, { ratio: number; label: string; tolerance: 
   CATEGORY_COVER:        { ratio: 1 / 1,   label: '1:1',  tolerance: 0.03 },
 };
 
+// MIME types sharp can generate thumbnails from (excludes svg, video)
+const THUMBABLE_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const THUMB_WIDTH = 400;
+
+function thumbPathFor(filePath: string): string {
+  const dir = path.dirname(filePath);
+  const stem = path.basename(filePath, path.extname(filePath));
+  return path.join(dir, `${stem}-thumb.webp`);
+}
+
+async function generateThumbnail(filePath: string, mimeType: string): Promise<string | null> {
+  if (!THUMBABLE_MIME.includes(mimeType)) return null;
+  try {
+    const thumbPath = thumbPathFor(filePath);
+    await sharp(filePath)
+      .resize({ width: THUMB_WIDTH, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(thumbPath);
+    return thumbPath;
+  } catch (err) {
+    // Non-fatal: original still stored, FE falls back to full URL
+    console.error('Thumbnail generation failed:', err);
+    return null;
+  }
+}
+
 // ─── Multer storage ──────────────────────────────────────────────────────────
 
 const storage = multer.diskStorage({
@@ -111,7 +137,27 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
 
     let folder = (req.body.folder || 'general').toString().toLowerCase();
     if (!ALLOWED_FOLDERS.includes(folder)) folder = 'general';
+
+    // Multer's destination callback runs before all text fields are parsed,
+    // so the file may have been written to a different folder than requested.
+    // Move it now that req.body is complete so disk path and stored URL agree.
+    const destDir = path.join(env.UPLOAD_DIR, folder);
+    const destPath = path.join(destDir, req.file.filename);
+    if (req.file.path !== destPath) {
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      fs.renameSync(req.file.path, destPath);
+      req.file.path = destPath;
+    }
+
     const publicUrl = `${env.PUBLIC_MEDIA_URL}/${folder}/${req.file.filename}`;
+
+    // Generate thumbnail on the fly (raster images only)
+    const thumbPath = await generateThumbnail(req.file.path, req.file.mimetype);
+    const thumbnailUrl = thumbPath
+      ? `${env.PUBLIC_MEDIA_URL}/${folder}/${path.basename(thumbPath)}`
+      : null;
 
     // ── Create MediaAsset record ─────────────────────────────────────────────
 
@@ -123,6 +169,7 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
         sizeBytes: req.file.size,
         path: req.file.path,
         url: publicUrl,
+        thumbnailUrl,
         folder,
         altText: req.body.altText ? req.body.altText.toString() : null,
         uploadedBy: req.user?.id || 'system',
@@ -197,6 +244,12 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
 
     if (fs.existsSync(asset.path)) {
       fs.unlinkSync(asset.path);
+    }
+
+    // Delete thumbnail file too
+    const thumbPath = thumbPathFor(asset.path);
+    if (fs.existsSync(thumbPath)) {
+      fs.unlinkSync(thumbPath);
     }
 
     await prisma.mediaAsset.delete({ where: { id } });

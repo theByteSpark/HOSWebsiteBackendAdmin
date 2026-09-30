@@ -209,11 +209,12 @@ model Product {
 }
 
 model ProductImage {
-  id        String   @id @default(uuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String
-  altText   String?
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url          String
+  thumbnailUrl String?
+  altText      String?
   sortOrder Int      @default(0)
   isHover   Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -235,11 +236,12 @@ model ProductVariant {
 // Per-variant image gallery — each metal finish has its own ordered images.
 // isPrimary = true marks the main display image for that variant.
 model VariantImage {
-  id        String         @id @default(uuid())
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  url       String
-  altText   String?
+  id           String         @id @default(uuid())
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  url          String
+  thumbnailUrl String?
+  altText      String?
   sortOrder Int            @default(0)
   isPrimary Boolean        @default(false)
   createdAt DateTime       @default(now())
@@ -582,6 +584,7 @@ model MediaAsset {
   sizeBytes    Int
   path         String   // Server-side filesystem path, e.g. "/var/www/.../uploads/products/a1b2c3d4.webp"
   url          String   // Public URL, e.g. "https://houseofseya.com/uploads/products/a1b2c3d4.webp"
+  thumbnailUrl String?  // 400px WebP thumbnail generated on upload (raster images only)
   folder       String?  // "products", "collections", "blogs", "pages", "homepage", "general"
   width        Int?
   height       Int?
