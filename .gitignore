@@ -3,23 +3,17 @@
 # Git Ignore
 # ==========================================
 
-# ------------------------------------------
 # Environment / Secrets
-# ------------------------------------------
 .env
 .env.*
 !.env.example
 !.env.sample
 
-# ------------------------------------------
 # Dependencies
-# ------------------------------------------
 node_modules/
 client/node_modules/
 
-# ------------------------------------------
 # Build / Generated Output
-# ------------------------------------------
 dist/
 build/
 client/dist/
@@ -28,9 +22,7 @@ client/build/
 # TypeScript generated files
 *.tsbuildinfo
 
-# ------------------------------------------
 # Logs
-# ------------------------------------------
 *.log
 logs/
 npm-debug.log*
@@ -38,14 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ------------------------------------------
 # Prisma
-# ------------------------------------------
-# Prisma generated client
+# Keep prisma/schema.prisma and prisma/migrations tracked
 node_modules/.prisma/
 node_modules/@prisma/client/
 
-# Local SQLite databases, if ever created
+# Local databases
 *.db
 *.sqlite
 *.sqlite3
@@ -53,27 +43,19 @@ node_modules/@prisma/client/
 # Prisma debug / temporary files
 prisma/*.log
 
-# ------------------------------------------
 # Uploaded / Runtime Media
-# ------------------------------------------
 uploads/
 storage/
 media/
-
-# Don't commit runtime uploaded files
 public/uploads/
 public/media/
 
-# ------------------------------------------
 # OS Files
-# ------------------------------------------
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ------------------------------------------
-# IDE / Editors
-# ------------------------------------------
+# IDE
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -81,39 +63,23 @@ desktop.ini
 .idea/
 *.iml
 
-# ------------------------------------------
-# Temporary / Backup Files
-# ------------------------------------------
+# Temporary / Backup
 *.tmp
 *.temp
 *.bak
 *.backup
 *~
 
-# ------------------------------------------
 # Testing / Coverage
-# ------------------------------------------
 coverage/
 .nyc_output/
 
-# ------------------------------------------
 # Cache
-# ------------------------------------------
 .cache/
 .parcel-cache/
 .vite/
 .eslintcache
 
-# ------------------------------------------
 # Misc generated files
-# ------------------------------------------
 *.tgz
 *.zip
-
-# ------------------------------------------
-# Local scripts / audit output
-# Uncomment if these are temporary only
-# ------------------------------------------
-# audit-products.ts
-# list-subcats.ts
-# seed-cms.ts
