@@ -20,6 +20,9 @@ import {
   HelpCircle,
   Star,
   Image as ImageIcon,
+  History,
+  Users,
+  Shield,
 } from 'lucide-react';
 
 interface NavItem {
@@ -63,6 +66,15 @@ export const AppShell: React.FC = () => {
         { label: 'Reviews', to: '/website?tab=reviews', icon: Star },
       ],
     },
+    {
+      key: 'admin',
+      label: 'ADMINISTRATION & AUDIT',
+      items: [
+        { label: 'Admin Users', to: '/settings?tab=users', icon: Users },
+        { label: 'Audit Logs', to: '/settings?tab=audit', icon: History },
+        { label: 'Site Settings', to: '/settings?tab=site', icon: Settings },
+      ],
+    },
   ];
 
   const toggleGroup = (key: string) => {
@@ -71,9 +83,9 @@ export const AppShell: React.FC = () => {
 
   const mobilePrimaryItems = [
     { label: 'Home', to: '/website?tab=home', icon: Home },
-    { label: 'About', to: '/website?tab=about', icon: Info },
     { label: 'Products', to: '/products', icon: Gem },
-    { label: 'Blogs', to: '/website?tab=blogs', icon: FileText },
+    { label: 'Users', to: '/settings?tab=users', icon: Users },
+    { label: 'Audit', to: '/settings?tab=audit', icon: History },
   ];
 
   return (
@@ -87,7 +99,7 @@ export const AppShell: React.FC = () => {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold tracking-tight text-graphite-900 truncate">House of Seya</p>
+              <p className="text-sm font-bold tracking-tight text-graphite-900 truncate">HOS</p>
               <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </div>
             <p className="text-[11px] font-medium text-graphite-400 truncate">Visual Content Manager</p>
@@ -155,10 +167,13 @@ export const AppShell: React.FC = () => {
         <div className="border-t border-graphite-200 bg-graphite-50/50 p-3 space-y-2">
           <div className="flex items-center gap-3 rounded-lg px-2 py-1.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white shadow-2xs">
-              {user?.name?.charAt(0) || 'A'}
+              {user?.name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'A'}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-bold text-graphite-900">{user?.name || 'Administrator'}</p>
+              {user?.email && (
+                <p className="truncate text-[10px] font-medium text-graphite-500 font-mono">{user.email}</p>
+              )}
               <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-brand-700">
                 {user?.role || 'SUPER_ADMIN'}
               </p>
@@ -183,7 +198,7 @@ export const AppShell: React.FC = () => {
             HOS
           </div>
           <div>
-            <p className="text-xs font-bold text-graphite-900 leading-tight">House of Seya</p>
+            <p className="text-xs font-bold text-graphite-900 leading-tight">HOS</p>
             <p className="text-[10px] font-medium text-graphite-400 leading-tight">Content Editor</p>
           </div>
         </div>

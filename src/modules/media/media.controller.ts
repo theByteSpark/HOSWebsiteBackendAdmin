@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { randomUUID } from 'crypto';
+import sharp from 'sharp';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { sendSuccess, sendError } from '../../utils/response';
@@ -15,17 +16,31 @@ if (!fs.existsSync(env.UPLOAD_DIR)) {
 
 const ALLOWED_FOLDERS = ['products', 'collections', 'blogs', 'pages', 'homepage', 'general'];
 
+// ─── Required aspect-ratio configs per upload context ────────────────────────
+// Mirrors client/src/lib/imageUploadConfig.ts — keep in sync.
+
+const CONTEXT_RATIOS: Record<string, { ratio: number; label: string; tolerance: number }> = {
+  PRODUCT_GALLERY:       { ratio: 3 / 2,   label: '3:2',  tolerance: 0.03 },
+  HOME_HERO_SLIDE:       { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  ABOUT_HERO:            { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  ABOUT_SECTION_PORTRAIT:{ ratio: 4 / 5,   label: '4:5',  tolerance: 0.03 },
+  GIFTING_HERO:          { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  DIAMOND_HERO:          { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  DIAMOND_SECTION:       { ratio: 4 / 3,   label: '4:3',  tolerance: 0.03 },
+  GOLD_VERMEIL_HERO:     { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  BLOG_COVER:            { ratio: 16 / 9,  label: '16:9', tolerance: 0.03 },
+  CATEGORY_COVER:        { ratio: 1 / 1,   label: '1:1',  tolerance: 0.03 },
+};
+
+// ─── Multer storage ──────────────────────────────────────────────────────────
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = (req.body.folder || 'general').toString().toLowerCase();
-    if (!ALLOWED_FOLDERS.includes(folder)) {
-      folder = 'general';
-    }
+    if (!ALLOWED_FOLDERS.includes(folder)) folder = 'general';
     const safeFolder = path.basename(folder);
     const destDir = path.join(env.UPLOAD_DIR, safeFolder);
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
     cb(null, destDir);
   },
   filename: (req, file, cb) => {
@@ -37,9 +52,11 @@ const storage = multer.diskStorage({
 
 export const uploadMiddleware = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
   fileFilter: (req, file, cb) => {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'video/mp4'];
+    const allowedMimeTypes = [
+      'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'video/mp4',
+    ];
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
@@ -48,17 +65,55 @@ export const uploadMiddleware = multer({
   },
 }).single('file');
 
+// ─── Upload handler ──────────────────────────────────────────────────────────
+
 export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.file) {
       return sendError(res, 'No file uploaded', 400);
     }
 
-    let folder = (req.body.folder || 'general').toString().toLowerCase();
-    if (!ALLOWED_FOLDERS.includes(folder)) {
-      folder = 'general';
+    // ── Backend image-dimension validation ───────────────────────────────────
+    // Read the actual file from disk and inspect its dimensions with sharp.
+    // This is defence-in-depth: the frontend should have cropped already, but
+    // we never trust frontend-provided width/height values.
+
+    const uploadContext = (req.body.uploadContext || '').toString().toUpperCase();
+    const contextConfig = CONTEXT_RATIOS[uploadContext];
+
+    if (contextConfig && req.file.mimetype.startsWith('image/')) {
+      try {
+        const meta = await sharp(req.file.path).metadata();
+        const { width, height } = meta;
+
+        if (width && height) {
+          const uploadedRatio = width / height;
+          const diff = Math.abs(uploadedRatio - contextConfig.ratio);
+
+          if (diff > contextConfig.tolerance) {
+            // Delete the already-saved file before responding
+            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+            return res.status(400).json({
+              success: false,
+              message: `Image ratio is not supported. Required ratio is ${contextConfig.label}. Please crop the image and try again.`,
+            });
+          }
+        }
+      } catch (sharpErr) {
+        // If sharp cannot read the file, delete it and reject
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return sendError(res, 'Image could not be processed. Please try another image.', 400, sharpErr);
+      }
     }
+
+    // ── Build public URL ─────────────────────────────────────────────────────
+
+    let folder = (req.body.folder || 'general').toString().toLowerCase();
+    if (!ALLOWED_FOLDERS.includes(folder)) folder = 'general';
     const publicUrl = `${env.PUBLIC_MEDIA_URL}/${folder}/${req.file.filename}`;
+
+    // ── Create MediaAsset record ─────────────────────────────────────────────
 
     const mediaAsset = await prisma.mediaAsset.create({
       data: {
@@ -90,6 +145,8 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
     return sendError(res, 'Media upload failed', 500, error);
   }
 };
+
+// ─── List media assets ───────────────────────────────────────────────────────
 
 export const getMediaAssets = async (req: Request, res: Response) => {
   try {
@@ -128,6 +185,8 @@ export const getMediaAssets = async (req: Request, res: Response) => {
   }
 };
 
+// ─── Delete media asset ──────────────────────────────────────────────────────
+
 export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -136,7 +195,6 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
       return sendError(res, 'Media asset not found', 404);
     }
 
-    // Delete file from disk if it exists
     if (fs.existsSync(asset.path)) {
       fs.unlinkSync(asset.path);
     }

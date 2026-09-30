@@ -9,14 +9,28 @@ export const getAuditLogs = async (req: Request, res: Response) => {
     const limit = (req.query.limit as string) || '50';
     const entityType = req.query.entityType as string | undefined;
     const action = req.query.action as AuditAction | undefined;
+    const adminUserId = req.query.adminUserId as string | undefined;
+    const search = req.query.search as string | undefined;
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
     const where: any = {};
-    if (entityType) where.entityType = entityType;
-    if (action) where.action = action;
+    if (entityType && entityType !== 'ALL') where.entityType = entityType;
+    if (action && (action as string) !== 'ALL') where.action = action;
+    if (adminUserId && adminUserId !== 'ALL') where.adminUserId = adminUserId;
+
+    if (search && search.trim() !== '') {
+      const q = search.trim();
+      where.OR = [
+        { note: { contains: q, mode: 'insensitive' } },
+        { entityType: { contains: q, mode: 'insensitive' } },
+        { entityId: { contains: q, mode: 'insensitive' } },
+        { admin: { email: { contains: q, mode: 'insensitive' } } },
+        { admin: { name: { contains: q, mode: 'insensitive' } } },
+      ];
+    }
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({

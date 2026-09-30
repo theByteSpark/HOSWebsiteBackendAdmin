@@ -1,6 +1,5 @@
 # ==========================================
 # HOUSE OF SEYA - Backend + Admin
-# Git Ignore
 # ==========================================
 
 # Environment / Secrets
@@ -19,7 +18,7 @@ build/
 client/dist/
 client/build/
 
-# TypeScript generated files
+# TypeScript / tooling generated files
 *.tsbuildinfo
 
 # Logs
@@ -30,8 +29,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Prisma
-# Keep prisma/schema.prisma and prisma/migrations tracked
+# Prisma generated client
 node_modules/.prisma/
 node_modules/@prisma/client/
 
@@ -40,17 +38,17 @@ node_modules/@prisma/client/
 *.sqlite
 *.sqlite3
 
-# Prisma debug / temporary files
+# Prisma temporary/debug files
 prisma/*.log
 
-# Uploaded / Runtime Media
+# Runtime uploaded media
 uploads/
 storage/
 media/
 public/uploads/
 public/media/
 
-# OS Files
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -63,14 +61,14 @@ desktop.ini
 .idea/
 *.iml
 
-# Temporary / Backup
+# Temporary / backup
 *.tmp
 *.temp
 *.bak
 *.backup
 *~
 
-# Testing / Coverage
+# Testing / coverage
 coverage/
 .nyc_output/
 
@@ -80,6 +78,6 @@ coverage/
 .vite/
 .eslintcache
 
-# Misc generated files
+# Archives / generated packages
 *.tgz
 *.zip

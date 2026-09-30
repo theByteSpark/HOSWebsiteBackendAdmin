@@ -48,10 +48,10 @@ export const LoginPage: React.FC = () => {
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-700 text-lg font-bold text-white shadow-md">
-            HS
+            HOS
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-graphite-900">House of Seya</h2>
+            <h2 className="text-xl font-bold tracking-tight text-graphite-900">HOS</h2>
             <p className="text-xs font-medium text-graphite-500 uppercase tracking-widest mt-0.5">
               Business Management Platform
             </p>

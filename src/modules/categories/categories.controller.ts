@@ -3,6 +3,7 @@ import { prisma } from '../../config/db';
 import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
+import { logAudit } from '../../utils/auditLogger';
 
 // ----------------------------------------------------
 // PRODUCT CATEGORIES
@@ -255,6 +256,15 @@ export const createSubcategory = async (req: AuthenticatedRequest, res: Response
       include: { seo: true },
     });
 
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'Subcategory',
+      entityId: subcategory.id,
+      after: subcategory,
+      note: `Created subcategory ${subcategory.name}`,
+    });
+
     return sendSuccess(res, subcategory, 'Subcategory created successfully', 201);
   } catch (error) {
     return sendError(res, 'Failed to create subcategory', 500, error);
@@ -313,6 +323,16 @@ export const updateSubcategory = async (req: AuthenticatedRequest, res: Response
       include: { seo: true },
     });
 
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'Subcategory',
+      entityId: updated.id,
+      before: existing,
+      after: updated,
+      note: `Updated subcategory ${updated.name}`,
+    });
+
     return sendSuccess(res, updated, 'Subcategory updated successfully');
   } catch (error) {
     return sendError(res, 'Failed to update subcategory', 500, error);
@@ -323,6 +343,8 @@ export const deleteSubcategory = async (req: AuthenticatedRequest, res: Response
   try {
     const id = req.params.id as string;
 
+    const existing = await prisma.subcategory.findUnique({ where: { id } });
+
     const productCount = await prisma.product.count({ where: { subcategoryId: id, deletedAt: null } });
     if (productCount > 0) {
       return sendError(res, `Cannot delete subcategory because ${productCount} active product(s) are assigned to it.`, 400);
@@ -330,6 +352,16 @@ export const deleteSubcategory = async (req: AuthenticatedRequest, res: Response
 
     await prisma.subcategorySEO.deleteMany({ where: { subcategoryId: id } });
     await prisma.subcategory.delete({ where: { id } });
+
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'Subcategory',
+      entityId: id,
+      before: existing,
+      note: `Deleted subcategory ${existing?.name || id}`,
+    });
+
     return sendSuccess(res, null, 'Subcategory deleted successfully');
   } catch (error) {
     return sendError(res, 'Failed to delete subcategory', 500, error);

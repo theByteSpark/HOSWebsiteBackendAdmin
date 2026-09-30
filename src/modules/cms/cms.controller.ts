@@ -4,6 +4,7 @@ import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { FAQContext } from '@prisma/client';
+import { logAudit } from '../../utils/auditLogger';
 
 // ----------------------------------------------------
 // HERO SLIDES
@@ -200,6 +201,17 @@ export const createBlogPost = async (req: AuthenticatedRequest, res: Response) =
       include: { category: true, seo: true },
     });
 
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'BlogPost',
+      entityId: post.id,
+      after: post,
+      note: `Created blog post ${post.title}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, post, 'Blog post created', 201);
   } catch (error) {
     return sendError(res, 'Failed to create blog post', 500, error);
@@ -210,6 +222,8 @@ export const updateBlogPost = async (req: AuthenticatedRequest, res: Response) =
   try {
     const id = req.params.id as string;
     const { title, slug, excerpt, body, sections, imageUrl, categoryId, isPublished, seo } = req.body;
+
+    const existing = await prisma.blogPost.findUnique({ where: { id } });
 
     const updated = await prisma.blogPost.update({
       where: { id },
@@ -236,6 +250,18 @@ export const updateBlogPost = async (req: AuthenticatedRequest, res: Response) =
       include: { category: true, seo: true },
     });
 
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'BlogPost',
+      entityId: updated.id,
+      before: existing,
+      after: updated,
+      note: `Updated blog post ${updated.title}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, updated, 'Blog post updated');
   } catch (error) {
     return sendError(res, 'Failed to update blog post', 500, error);
@@ -245,7 +271,20 @@ export const updateBlogPost = async (req: AuthenticatedRequest, res: Response) =
 export const deleteBlogPost = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const existing = await prisma.blogPost.findUnique({ where: { id } });
     await prisma.blogPost.delete({ where: { id } });
+
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'BlogPost',
+      entityId: id,
+      before: existing,
+      note: `Deleted blog post ${existing?.title || id}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, null, 'Blog post deleted');
   } catch (error) {
     return sendError(res, 'Failed to delete blog post', 500, error);
@@ -310,6 +349,17 @@ export const createFAQ = async (req: AuthenticatedRequest, res: Response) => {
       },
     });
 
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'FAQ',
+      entityId: faq.id,
+      after: faq,
+      note: `Created FAQ: ${faq.question}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, faq, 'FAQ created', 201);
   } catch (error) {
     return sendError(res, 'Failed to create FAQ', 500, error);
@@ -319,10 +369,25 @@ export const createFAQ = async (req: AuthenticatedRequest, res: Response) => {
 export const updateFAQ = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const existing = await prisma.fAQ.findUnique({ where: { id } });
+
     const updated = await prisma.fAQ.update({
       where: { id },
       data: req.body,
     });
+
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'FAQ',
+      entityId: updated.id,
+      before: existing,
+      after: updated,
+      note: `Updated FAQ: ${updated.question}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, updated, 'FAQ updated');
   } catch (error) {
     return sendError(res, 'Failed to update FAQ', 500, error);
@@ -332,7 +397,20 @@ export const updateFAQ = async (req: AuthenticatedRequest, res: Response) => {
 export const deleteFAQ = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const existing = await prisma.fAQ.findUnique({ where: { id } });
     await prisma.fAQ.delete({ where: { id } });
+
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'FAQ',
+      entityId: id,
+      before: existing,
+      note: `Deleted FAQ: ${existing?.question || id}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, null, 'FAQ deleted');
   } catch (error) {
     return sendError(res, 'Failed to delete FAQ', 500, error);
@@ -377,6 +455,8 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response) => {
     const slug = req.params.slug as string;
     const { title, content, isPublished, seo } = req.body;
 
+    const existing = await prisma.page.findUnique({ where: { slug } });
+
     const page = await prisma.page.upsert({
       where: { slug },
       update: {
@@ -399,6 +479,18 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response) => {
         seo: seo ? { create: seo } : undefined,
       },
       include: { seo: true },
+    });
+
+    await logAudit({
+      action: existing ? 'UPDATE' : 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'Page',
+      entityId: page.id,
+      before: existing,
+      after: page,
+      note: `${existing ? 'Updated' : 'Created'} CMS page ${slug}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
     });
 
     return sendSuccess(res, page, 'Page saved successfully');

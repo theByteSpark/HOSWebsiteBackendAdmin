@@ -3,6 +3,7 @@ import { prisma } from '../../config/db';
 import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
+import { logAudit } from '../../utils/auditLogger';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -77,13 +78,13 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
-export const getProductByIdOrSlug = async (req: Request, res: Response) => {
+export const getProductById = async (req: Request, res: Response) => {
   try {
-    const idOrSlug = req.params.idOrSlug as string;
+    const id = req.params.id as string;
     const product = await prisma.product.findFirst({
       where: {
+        id,
         deletedAt: null,
-        OR: [{ id: idOrSlug }, { slug: idOrSlug }],
       },
       include: {
         category: true,
@@ -138,30 +139,65 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       return sendError(res, 'Name, categoryId, and price are required', 400);
     }
 
-    const prodSlug = slug || generateSlug(name);
-    const existingSlug = await prisma.product.findUnique({ where: { slug: prodSlug } });
-    if (existingSlug) {
-      return sendError(res, 'Product slug already exists', 400);
+    // Validate Category exists
+    const categoryExists = await prisma.productCategory.findUnique({ where: { id: categoryId } });
+    if (!categoryExists) {
+      return sendError(res, `Selected category does not exist.`, 400);
+    }
+
+    // Validate Subcategory belongs to Category
+    if (subcategoryId && subcategoryId !== '') {
+      const subcat = await prisma.subcategory.findUnique({ where: { id: subcategoryId } });
+      if (!subcat) {
+        return sendError(res, `Selected subcategory does not exist.`, 400);
+      }
+      if (subcat.categoryId !== categoryId) {
+        return sendError(res, `Selected subcategory "${subcat.name}" does not belong to the category "${categoryExists.name}".`, 400);
+      }
+    }
+
+    const trimmedSku = sku && typeof sku === 'string' && sku.trim() !== '' ? sku.trim() : null;
+
+    if (trimmedSku) {
+      const existingSku = await prisma.product.findUnique({
+        where: { sku: trimmedSku },
+      });
+      if (existingSku) {
+        return sendError(res, `SKU code "${trimmedSku}" already exists.`, 400);
+      }
+    }
+
+    const parsedOriginalPrice =
+      originalPrice !== undefined && originalPrice !== null && originalPrice !== ''
+        ? Number(originalPrice)
+        : null;
+
+    let baseSlug = slug || generateSlug(name);
+    let prodSlug = baseSlug;
+    let counter = 1;
+    while (await prisma.product.findUnique({ where: { slug: prodSlug } })) {
+      prodSlug = `${baseSlug}-${counter}`;
+      counter++;
     }
 
     const product = await prisma.product.create({
       data: {
         name,
         slug: prodSlug,
-        sku,
+        sku: trimmedSku,
         categoryId,
-        subcategoryId,
+        subcategoryId: subcategoryId || null,
         price,
-        originalPrice,
-        description,
-        shortDescription,
+        originalPrice: parsedOriginalPrice,
+        description: description || null,
+        shortDescription: shortDescription || null,
         isPublished: isPublished !== undefined ? isPublished : false,
         inStock: inStock !== undefined ? inStock : true,
         isMadeToOrder: isMadeToOrder || false,
-        netWeightGrams,
-        totalDiamondCt,
-        totalDiamondPcs,
-        diamondGrade,
+        netWeightGrams: netWeightGrams !== undefined && netWeightGrams !== null && netWeightGrams !== '' ? Number(netWeightGrams) : null,
+        totalDiamondCt: totalDiamondCt !== undefined && totalDiamondCt !== null && totalDiamondCt !== '' ? Number(totalDiamondCt) : null,
+        totalDiamondPcs: totalDiamondPcs !== undefined && totalDiamondPcs !== null && totalDiamondPcs !== '' ? Number(totalDiamondPcs) : null,
+        diamondGrade: diamondGrade || null,
         images: images ? { create: images } : undefined,
         variants: variants ? { create: variants } : undefined,
         seo: seo ? { create: seo } : undefined,
@@ -230,6 +266,48 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
       return sendError(res, 'Product not found', 404);
     }
 
+    const targetCategoryId = categoryId || existing.categoryId;
+    const targetSubcategoryId = subcategoryId !== undefined ? (subcategoryId || null) : existing.subcategoryId;
+
+    const categoryExists = await prisma.productCategory.findUnique({ where: { id: targetCategoryId } });
+    if (!categoryExists) {
+      return sendError(res, `Selected category does not exist.`, 400);
+    }
+
+    if (targetSubcategoryId) {
+      const subcat = await prisma.subcategory.findUnique({ where: { id: targetSubcategoryId } });
+      if (!subcat) {
+        return sendError(res, `Selected subcategory does not exist.`, 400);
+      }
+      if (subcat.categoryId !== targetCategoryId) {
+        return sendError(res, `Selected subcategory "${subcat.name}" does not belong to category "${categoryExists.name}".`, 400);
+      }
+    }
+
+    let trimmedSku: string | null | undefined = undefined;
+    if (sku !== undefined) {
+      trimmedSku = sku && typeof sku === 'string' && sku.trim() !== '' ? sku.trim() : null;
+      if (trimmedSku) {
+        const existingSku = await prisma.product.findFirst({
+          where: {
+            sku: trimmedSku,
+            id: { not: id },
+          },
+        });
+        if (existingSku) {
+          return sendError(res, `SKU code "${trimmedSku}" already exists.`, 400);
+        }
+      }
+    }
+
+    let parsedOriginalPrice: number | null | undefined = undefined;
+    if (originalPrice !== undefined) {
+      parsedOriginalPrice =
+        originalPrice !== null && originalPrice !== ''
+          ? Number(originalPrice)
+          : null;
+    }
+
     if (images && Array.isArray(images)) {
       await prisma.productImage.deleteMany({ where: { productId: id } });
       if (images.length > 0) {
@@ -266,20 +344,20 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
       data: {
         ...(name && { name }),
         ...(slug && { slug }),
-        ...(sku !== undefined && { sku }),
+        ...(trimmedSku !== undefined && { sku: trimmedSku }),
         ...(categoryId && { categoryId }),
-        ...(subcategoryId !== undefined && { subcategoryId }),
+        ...(subcategoryId !== undefined && { subcategoryId: subcategoryId || null }),
         ...(price !== undefined && { price }),
-        ...(originalPrice !== undefined && { originalPrice }),
-        ...(description !== undefined && { description }),
-        ...(shortDescription !== undefined && { shortDescription }),
+        ...(parsedOriginalPrice !== undefined && { originalPrice: parsedOriginalPrice }),
+        ...(description !== undefined && { description: description || null }),
+        ...(shortDescription !== undefined && { shortDescription: shortDescription || null }),
         ...(isPublished !== undefined && { isPublished }),
         ...(inStock !== undefined && { inStock }),
         ...(isMadeToOrder !== undefined && { isMadeToOrder }),
-        ...(netWeightGrams !== undefined && { netWeightGrams }),
-        ...(totalDiamondCt !== undefined && { totalDiamondCt }),
-        ...(totalDiamondPcs !== undefined && { totalDiamondPcs }),
-        ...(diamondGrade !== undefined && { diamondGrade }),
+        ...(netWeightGrams !== undefined && { netWeightGrams: netWeightGrams !== null && netWeightGrams !== '' ? Number(netWeightGrams) : null }),
+        ...(totalDiamondCt !== undefined && { totalDiamondCt: totalDiamondCt !== null && totalDiamondCt !== '' ? Number(totalDiamondCt) : null }),
+        ...(totalDiamondPcs !== undefined && { totalDiamondPcs: totalDiamondPcs !== null && totalDiamondPcs !== '' ? Number(totalDiamondPcs) : null }),
+        ...(diamondGrade !== undefined && { diamondGrade: diamondGrade || null }),
         ...(seo
           ? {
               seo: {
@@ -366,6 +444,18 @@ export const publishProduct = async (req: AuthenticatedRequest, res: Response) =
       data: { isPublished: isPublished !== undefined ? Boolean(isPublished) : !existing.isPublished },
     });
 
+    await logAudit({
+      action: updated.isPublished ? 'PUBLISH' : 'UNPUBLISH',
+      adminUserId: req.user?.id,
+      entityType: 'Product',
+      entityId: updated.id,
+      before: { isPublished: existing.isPublished },
+      after: { isPublished: updated.isPublished },
+      note: `Product ${existing.name} ${updated.isPublished ? 'published' : 'unpublished'}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     return sendSuccess(res, updated, `Product ${updated.isPublished ? 'published' : 'unpublished'} successfully`);
   } catch (error) {
     return sendError(res, 'Failed to update product publish status', 500, error);
@@ -390,6 +480,16 @@ export const createVariant = async (req: AuthenticatedRequest, res: Response) =>
       data: { productId, metalFinish, swatchColor, priceOffset, isDefault: isDefault || false, inStock: inStock !== false, sku },
       include: { images: { orderBy: { sortOrder: 'asc' } } },
     });
+
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'ProductVariant',
+      entityId: variant.id,
+      after: variant,
+      note: `Created variant ${metalFinish} for product ${existing.name}`,
+    });
+
     return sendSuccess(res, variant, 'Variant created', 201);
   } catch (error) {
     return sendError(res, 'Failed to create variant', 500, error);
@@ -416,6 +516,17 @@ export const updateVariant = async (req: AuthenticatedRequest, res: Response) =>
       },
       include: { images: { orderBy: { sortOrder: 'asc' } } },
     });
+
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'ProductVariant',
+      entityId: updated.id,
+      before: variant,
+      after: updated,
+      note: `Updated variant ${updated.metalFinish}`,
+    });
+
     return sendSuccess(res, updated, 'Variant updated');
   } catch (error) {
     return sendError(res, 'Failed to update variant', 500, error);
@@ -429,6 +540,16 @@ export const deleteVariant = async (req: AuthenticatedRequest, res: Response) =>
     if (!variant) return sendError(res, 'Variant not found', 404);
 
     await prisma.productVariant.delete({ where: { id: variantId } });
+
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'ProductVariant',
+      entityId: variantId,
+      before: variant,
+      note: `Deleted variant ${variant.metalFinish}`,
+    });
+
     return sendSuccess(res, null, 'Variant deleted');
   } catch (error) {
     return sendError(res, 'Failed to delete variant', 500, error);
@@ -449,6 +570,19 @@ export const addVariantImage = async (req: AuthenticatedRequest, res: Response) 
     const variant = await prisma.productVariant.findUnique({ where: { id: variantId } });
     if (!variant) return sendError(res, 'Variant not found', 404);
 
+    // Enforce hard limit of 5 total images per product across all variants
+    const totalProductImagesCount = await prisma.variantImage.count({
+      where: {
+        variant: {
+          productId: variant.productId,
+        },
+      },
+    });
+
+    if (totalProductImagesCount >= 5) {
+      return sendError(res, 'A product can have a maximum of 5 images.', 400);
+    }
+
     // If this is set as primary, clear existing primary
     if (isPrimary) {
       await prisma.variantImage.updateMany({ where: { variantId, isPrimary: true }, data: { isPrimary: false } });
@@ -457,6 +591,16 @@ export const addVariantImage = async (req: AuthenticatedRequest, res: Response) 
     const image = await prisma.variantImage.create({
       data: { variantId, url, altText, sortOrder: sortOrder ?? 0, isPrimary: isPrimary || false },
     });
+
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'VariantImage',
+      entityId: image.id,
+      after: image,
+      note: `Added variant image for variant ${variant.metalFinish}`,
+    });
+
     return sendSuccess(res, image, 'Image added', 201);
   } catch (error) {
     return sendError(res, 'Failed to add image', 500, error);
@@ -470,6 +614,16 @@ export const deleteVariantImage = async (req: AuthenticatedRequest, res: Respons
     if (!img) return sendError(res, 'Image not found', 404);
 
     await prisma.variantImage.delete({ where: { id: imageId } });
+
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'VariantImage',
+      entityId: imageId,
+      before: img,
+      note: `Deleted variant image`,
+    });
+
     return sendSuccess(res, null, 'Image deleted');
   } catch (error) {
     return sendError(res, 'Failed to delete image', 500, error);
@@ -497,6 +651,16 @@ export const reorderVariantImages = async (req: AuthenticatedRequest, res: Respo
       where: { variantId },
       orderBy: { sortOrder: 'asc' },
     });
+
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'VariantImage',
+      entityId: variantId,
+      after: { reorderedImagesCount: images.length },
+      note: `Reordered variant images for variant ${variantId}`,
+    });
+
     return sendSuccess(res, updated, 'Images reordered');
   } catch (error) {
     return sendError(res, 'Failed to reorder images', 500, error);

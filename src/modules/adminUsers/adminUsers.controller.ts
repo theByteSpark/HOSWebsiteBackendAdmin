@@ -4,6 +4,7 @@ import { hashPassword } from '../../utils/hash';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
 import { AdminRole } from '@prisma/client';
+import { logAudit } from '../../utils/auditLogger';
 
 export const getAdminUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -88,15 +89,15 @@ export const createAdminUser = async (req: AuthenticatedRequest, res: Response) 
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'AdminUser',
-        entityId: newUser.id,
-        after: newUser as any,
-        note: `Created admin user ${newUser.email}`,
-      },
+    await logAudit({
+      action: 'CREATE',
+      adminUserId: req.user?.id,
+      entityType: 'AdminUser',
+      entityId: newUser.id,
+      after: newUser,
+      note: `Created admin user ${newUser.email} with role ${newUser.role}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
     });
 
     return sendSuccess(res, newUser, 'Admin user created successfully', 201);
@@ -138,16 +139,16 @@ export const updateAdminUser = async (req: AuthenticatedRequest, res: Response) 
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'UPDATE',
-        adminUserId: req.user?.id,
-        entityType: 'AdminUser',
-        entityId: updatedUser.id,
-        before: existing as any,
-        after: updatedUser as any,
-        note: `Updated admin user ${updatedUser.email}`,
-      },
+    await logAudit({
+      action: 'UPDATE',
+      adminUserId: req.user?.id,
+      entityType: 'AdminUser',
+      entityId: updatedUser.id,
+      before: existing,
+      after: updatedUser,
+      note: `Updated admin user ${updatedUser.email}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
     });
 
     return sendSuccess(res, updatedUser, 'Admin user updated successfully');
@@ -171,15 +172,15 @@ export const deleteAdminUser = async (req: AuthenticatedRequest, res: Response) 
 
     await prisma.adminUser.delete({ where: { id } });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'DELETE',
-        adminUserId: req.user?.id,
-        entityType: 'AdminUser',
-        entityId: id,
-        before: existing as any,
-        note: `Deleted admin user ${existing.email}`,
-      },
+    await logAudit({
+      action: 'DELETE',
+      adminUserId: req.user?.id,
+      entityType: 'AdminUser',
+      entityId: id,
+      before: existing,
+      note: `Deleted admin user ${existing.email}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
     });
 
     return sendSuccess(res, null, 'Admin user deleted successfully');

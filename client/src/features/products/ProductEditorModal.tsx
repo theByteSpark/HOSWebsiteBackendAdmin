@@ -20,11 +20,38 @@ import { Modal } from '@/components/ui/Modal';
 import { Input, Select } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { apiClient } from '@/lib/apiClient';
+import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
+import {
+  IMAGE_UPLOAD_CONFIGS,
+  isRatioCorrect,
+  meetsMinResolution,
+} from '@/lib/imageUploadConfig';
 import type { Product, ProductCategory, Subcategory, ProductVariant, VariantImage } from '@/types';
 import {
   Gem, ImageIcon, Plus, Trash2, Star, GripVertical, AlertTriangle,
   ChevronUp, ChevronDown, Loader2, CheckCircle2,
 } from 'lucide-react';
+
+// ── Product image ratio config (3:2) ──────────────────────────────────────
+const PRODUCT_IMG_CONFIG = IMAGE_UPLOAD_CONFIGS.PRODUCT_GALLERY;
+
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function getImageDimensions(src: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = reject;
+    img.src = src;
+  });
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -100,18 +127,29 @@ async function uploadFileToMedia(file: File): Promise<string> {
 interface VariantImagePanelProps {
   section: MetalSection;
   productId: string;
+  totalProductImagesCount: number;
   onChange: (variantId: string, images: VariantImage[]) => void;
 }
 
-const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productId, onChange }) => {
+const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productId, totalProductImagesCount, onChange }) => {
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [settingPrimaryId, setSettingPrimaryId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Crop modal state
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
+  // Pending files to process after current crop (multi-file select)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [pendingIsFirst, setPendingIsFirst] = useState(false);
+  const [pendingBaseOrder, setPendingBaseOrder] = useState(0);
+  const [pendingFileIndex, setPendingFileIndex] = useState(0);
 
   const refresh = useCallback(async () => {
     if (!section.variantId) return;
-    // Re-fetch the product to get fresh images
     const res = await apiClient.get(`/products/${productId}`);
     const updated: Product = res.data.data || res.data;
     const variant = updated.variants?.find(v => v.id === section.variantId);
@@ -120,30 +158,98 @@ const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productI
     queryClient.invalidateQueries({ queryKey: ['products'] });
   }, [section.variantId, productId, onChange, queryClient]);
 
+  // Upload a single already-validated / cropped file to the server
+  const doUploadSingleFile = async (file: File, order: number, isPrimary: boolean) => {
+    const url = await uploadFileToMedia(file);
+    await apiClient.post(`/products/variants/${section.variantId}/images`, {
+      url,
+      altText: `${section.metalFinish} view ${order + 1}`,
+      sortOrder: order,
+      isPrimary,
+    });
+  };
+
+  // Process next file in the pending queue (called after each crop or direct upload)
+  const processNextFile = useCallback(async (
+    files: File[],
+    idx: number,
+    baseOrder: number,
+    isFirst: boolean,
+  ) => {
+    if (idx >= files.length) {
+      await refresh();
+      setUploading(false);
+      return;
+    }
+    const file = files[idx];
+    const dataUrl = await readFileAsDataURL(file);
+    const { width, height } = await getImageDimensions(dataUrl);
+
+    // Minimum resolution
+    if (!meetsMinResolution(width, height, PRODUCT_IMG_CONFIG)) {
+      setUploadError(
+        `Image resolution is too small. Please upload a higher-resolution image (minimum ${PRODUCT_IMG_CONFIG.minWidth}×${PRODUCT_IMG_CONFIG.minHeight} px).`,
+      );
+      setUploading(false);
+      return;
+    }
+
+    if (isRatioCorrect(width, height, PRODUCT_IMG_CONFIG)) {
+      // Correct ratio → upload directly
+      await doUploadSingleFile(file, baseOrder + idx, isFirst && idx === 0);
+      await processNextFile(files, idx + 1, baseOrder, isFirst);
+    } else {
+      // Wrong ratio → open crop modal
+      setCropSrc(dataUrl);
+      setCropFile(file);
+      setPendingFiles(files);
+      setPendingIsFirst(isFirst);
+      setPendingBaseOrder(baseOrder);
+      setPendingFileIndex(idx);
+      setShowCropper(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section.variantId, section.metalFinish, section.dbImages, refresh]);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length || !section.variantId) return;
     e.target.value = '';
-
+    setUploadError(null);
     setUploading(true);
+    const isFirst = section.dbImages.length === 0;
+    const baseOrder = section.dbImages.length;
     try {
-      const isFirst = section.dbImages.length === 0;
-      for (let i = 0; i < files.length; i++) {
-        const url = await uploadFileToMedia(files[i]);
-        const nextOrder = section.dbImages.length + i;
-        await apiClient.post(`/products/variants/${section.variantId}/images`, {
-          url,
-          altText: `${section.metalFinish} view ${nextOrder + 1}`,
-          sortOrder: nextOrder,
-          isPrimary: isFirst && i === 0,
-        });
-      }
-      await refresh();
+      await processNextFile(files, 0, baseOrder, isFirst);
     } catch (err) {
       console.error('Upload failed', err);
-    } finally {
       setUploading(false);
     }
+  };
+
+  // Called when the admin completes a crop
+  const handleCropped = async (croppedFile: File) => {
+    setShowCropper(false);
+    setCropSrc(null);
+    setCropFile(null);
+    try {
+      await doUploadSingleFile(
+        croppedFile,
+        pendingBaseOrder + pendingFileIndex,
+        pendingIsFirst && pendingFileIndex === 0,
+      );
+      await processNextFile(pendingFiles, pendingFileIndex + 1, pendingBaseOrder, pendingIsFirst);
+    } catch (err) {
+      console.error('Upload after crop failed', err);
+      setUploading(false);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setCropSrc(null);
+    setCropFile(null);
+    setUploading(false);
   };
 
   const handleDelete = async (imageId: string) => {
@@ -206,119 +312,155 @@ const VariantImagePanel: React.FC<VariantImagePanelProps> = ({ section, productI
   const missingWarning = images.length === 0;
 
   return (
-    <div className="space-y-3">
-      {/* Image grid */}
-      {images.length > 0 && (
-        <div className="flex flex-wrap gap-3">
-          {images.map((img, idx) => (
-            <div key={img.id} className="relative group w-24 rounded-lg overflow-hidden border border-graphite-200 bg-graphite-50 flex-shrink-0">
-              {/* Image */}
-              <div className="aspect-square w-full overflow-hidden">
-                <img src={img.url} alt={img.altText || ''} className="w-full h-full object-cover" />
-              </div>
+    <>
+      {/* Crop modal */}
+      {showCropper && cropSrc && cropFile && (
+        <ImageCropperModal
+          isOpen={showCropper}
+          imageSrc={cropSrc}
+          originalFile={cropFile}
+          config={PRODUCT_IMG_CONFIG}
+          onCrop={handleCropped}
+          onCancel={handleCropCancel}
+        />
+      )}
 
-              {/* Primary badge */}
-              {img.isPrimary && (
-                <div className="absolute top-1 left-1 bg-brand-700 text-white rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide flex items-center gap-0.5">
-                  <Star className="h-2.5 w-2.5" /> Primary
-                </div>
-              )}
-
-              {/* Controls overlay */}
-              <div className="absolute inset-x-0 bottom-0 bg-graphite-900/80 p-1 flex items-center justify-between gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                {/* Reorder */}
-                <div className="flex flex-col gap-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleMoveUp(idx)}
-                    disabled={idx === 0}
-                    className="p-0.5 rounded text-white/80 hover:text-white disabled:opacity-30"
-                    title="Move up"
-                  >
-                    <ChevronUp className="h-3 w-3" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMoveDown(idx)}
-                    disabled={idx === images.length - 1}
-                    className="p-0.5 rounded text-white/80 hover:text-white disabled:opacity-30"
-                    title="Move down"
-                  >
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
+      <div className="space-y-3">
+        {/* Image grid */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-3">
+            {images.map((img, idx) => (
+              <div key={img.id} className="relative group w-24 rounded-lg overflow-hidden border border-graphite-200 bg-graphite-50 flex-shrink-0">
+                {/* Image */}
+                <div className="aspect-square w-full overflow-hidden">
+                  <img src={img.url} alt={img.altText || ''} className="w-full h-full object-cover" />
                 </div>
 
-                {/* Set primary */}
-                {!img.isPrimary && (
-                  <button
-                    type="button"
-                    onClick={() => handleSetPrimary(img.id)}
-                    disabled={!!settingPrimaryId}
-                    className="p-0.5 rounded text-yellow-400 hover:text-yellow-300"
-                    title="Set as primary"
-                  >
-                    {settingPrimaryId === img.id
-                      ? <Loader2 className="h-3 w-3 animate-spin" />
-                      : <Star className="h-3 w-3" />
-                    }
-                  </button>
+                {/* Primary badge */}
+                {img.isPrimary && (
+                  <div className="absolute top-1 left-1 bg-brand-700 text-white rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide flex items-center gap-0.5">
+                    <Star className="h-2.5 w-2.5" /> Primary
+                  </div>
                 )}
 
-                {/* Delete */}
-                <button
-                  type="button"
-                  onClick={() => handleDelete(img.id)}
-                  disabled={!!deletingId}
-                  className="p-0.5 rounded text-red-400 hover:text-red-300"
-                  title="Delete image"
-                >
-                  {deletingId === img.id
-                    ? <Loader2 className="h-3 w-3 animate-spin" />
-                    : <Trash2 className="h-3 w-3" />
-                  }
-                </button>
+                {/* Controls overlay */}
+                <div className="absolute inset-x-0 bottom-0 bg-graphite-900/80 p-1 flex items-center justify-between gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Reorder */}
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveUp(idx)}
+                      disabled={idx === 0}
+                      className="p-0.5 rounded text-white/80 hover:text-white disabled:opacity-30"
+                      title="Move up"
+                    >
+                      <ChevronUp className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveDown(idx)}
+                      disabled={idx === images.length - 1}
+                      className="p-0.5 rounded text-white/80 hover:text-white disabled:opacity-30"
+                      title="Move down"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </div>
+
+                  {/* Set primary */}
+                  {!img.isPrimary && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetPrimary(img.id)}
+                      disabled={!!settingPrimaryId}
+                      className="p-0.5 rounded text-yellow-400 hover:text-yellow-300"
+                      title="Set as primary"
+                    >
+                      {settingPrimaryId === img.id
+                        ? <Loader2 className="h-3 w-3 animate-spin" />
+                        : <Star className="h-3 w-3" />
+                      }
+                    </button>
+                  )}
+
+                  {/* Delete */}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(img.id)}
+                    disabled={!!deletingId}
+                    className="p-0.5 rounded text-red-400 hover:text-red-300"
+                    title="Delete image"
+                  >
+                    {deletingId === img.id
+                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                      : <Trash2 className="h-3 w-3" />
+                    }
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {/* Missing warning */}
-      {missingWarning && (
-        <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
-          No images uploaded for {section.metalFinish}
-        </div>
-      )}
+        {/* Missing warning */}
+        {missingWarning && (
+          <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+            No images uploaded for {section.metalFinish}
+          </div>
+        )}
 
-      {/* Upload button */}
-      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-dashed border-graphite-300 bg-graphite-50 px-3 py-2 text-xs font-semibold text-graphite-600 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 transition-colors">
-        {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-        {uploading ? 'Uploading...' : `Add ${section.metalFinish} Image`}
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          disabled={uploading || !section.variantId}
-          onChange={handleUpload}
-        />
-      </label>
-      {images.length > 0 && (
-        <p className="text-[10px] text-graphite-400">{images.length} image{images.length !== 1 ? 's' : ''} · hover to edit · ★ = primary (shown on storefront)</p>
-      )}
-    </div>
+        {/* Upload error */}
+        {uploadError && (
+          <div className="flex items-center gap-1.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+            {uploadError}
+          </div>
+        )}
+
+        {/* Upload button or Maximum 5 limit message */}
+        {totalProductImagesCount >= 5 ? (
+          <div className="text-xs text-brand-700 bg-brand-50 border border-brand-200 rounded-lg px-3 py-2 font-medium flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-brand-600" />
+            Maximum 5 images allowed per product.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-dashed border-graphite-300 bg-graphite-50 px-3 py-2 text-xs font-semibold text-graphite-600 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+              {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+              {uploading ? 'Uploading...' : `Add ${section.metalFinish} Image`}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                disabled={uploading || !section.variantId}
+                onChange={handleUpload}
+              />
+            </label>
+            <p className="text-[10px] text-brand-600 font-medium">
+              Required ratio: 3:2 (e.g. 1500&times;1000 px) &middot; Wrong ratio opens crop editor
+            </p>
+          </div>
+        )}
+        {images.length > 0 && (
+          <p className="text-[10px] text-graphite-400">{images.length} image{images.length !== 1 ? 's' : ''} · hover to edit · ★ = primary (shown on storefront)</p>
+        )}
+      </div>
+    </>
   );
 };
+
 
 // ── Pending Image Panel (create mode — before product exists) ──────────────
 
 interface PendingImagePanelProps {
   section: MetalSection;
+  totalProductImagesCount: number;
   onChange: (metalFinish: string, pending: PendingImage[]) => void;
 }
 
-const PendingImagePanel: React.FC<PendingImagePanelProps> = ({ section, onChange }) => {
+const PendingImagePanel: React.FC<PendingImagePanelProps> = ({ section, totalProductImagesCount, onChange }) => {
   const handleFilePick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
@@ -388,11 +530,18 @@ const PendingImagePanel: React.FC<PendingImagePanelProps> = ({ section, onChange
         </div>
       )}
 
-      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-dashed border-graphite-300 bg-graphite-50 px-3 py-2 text-xs font-semibold text-graphite-600 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 transition-colors">
-        <Plus className="h-3.5 w-3.5" />
-        Add {section.metalFinish} Image
-        <input type="file" accept="image/*" multiple className="hidden" onChange={handleFilePick} />
-      </label>
+      {totalProductImagesCount >= 5 ? (
+        <div className="text-xs text-brand-700 bg-brand-50 border border-brand-200 rounded-lg px-3 py-2 font-medium flex items-center gap-1.5">
+          <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-brand-600" />
+          Maximum 5 images allowed per product.
+        </div>
+      ) : (
+        <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-dashed border-graphite-300 bg-graphite-50 px-3 py-2 text-xs font-semibold text-graphite-600 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 transition-colors">
+          <Plus className="h-3.5 w-3.5" />
+          Add {section.metalFinish} Image
+          <input type="file" accept="image/*" multiple className="hidden" onChange={handleFilePick} />
+        </label>
+      )}
       {images.length > 0 && (
         <p className="text-[10px] text-graphite-400">{images.length} image{images.length !== 1 ? 's' : ''} staged · first = primary</p>
       )}
@@ -414,7 +563,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
   // ── Product fields ─────────────────────────────────────────────────────
   const [name, setName]                       = useState('');
-  const [slug, setSlug]                       = useState('');
   const [sku, setSku]                         = useState('');
   const [categoryId, setCategoryId]           = useState('');
   const [subcategoryId, setSubcategoryId]     = useState('');
@@ -441,7 +589,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     if (!isOpen) return;
     if (product) {
       setName(product.name || '');
-      setSlug(product.slug || '');
       setSku(product.sku || '');
       setCategoryId(product.categoryId || (categories[0]?.id ?? ''));
       setSubcategoryId(product.subcategoryId || '');
@@ -456,7 +603,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
       setInStock(product.inStock);
       setMetalSections(buildMetalSections(product));
     } else {
-      setName(''); setSlug(''); setSku('');
+      setName(''); setSku('');
       setCategoryId(categories[0]?.id || ''); setSubcategoryId('');
       setPrice(''); setOriginalPrice(''); setDescription('');
       setNetWeightGrams(''); setTotalDiamondCt(''); setTotalDiamondPcs('');
@@ -472,9 +619,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
   const handleNameChange = (val: string) => {
     setName(val);
-    if (!isEditing) {
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
-    }
   };
 
   // ── Update metal section images (edit-mode callback) ───────────────────
@@ -517,16 +661,19 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         setSaveStep('Updating product info…');
 
         await apiClient.patch(`/products/${product!.id}`, {
-          name, slug, sku: sku || undefined,
-          categoryId, subcategoryId: subcategoryId || undefined,
+          name,
+          sku: sku.trim() ? sku.trim() : null,
+          categoryId,
+          subcategoryId: subcategoryId || null,
           price: Number(price),
-          originalPrice: originalPrice ? Number(originalPrice) : undefined,
-          description: description || undefined,
-          netWeightGrams: netWeightGrams ? Number(netWeightGrams) : undefined,
-          totalDiamondCt: totalDiamondCt ? Number(totalDiamondCt) : undefined,
-          totalDiamondPcs: totalDiamondPcs ? Number(totalDiamondPcs) : undefined,
-          diamondGrade: diamondGrade || undefined,
-          isPublished, inStock,
+          originalPrice: originalPrice.trim() ? Number(originalPrice) : null,
+          description: description || null,
+          netWeightGrams: netWeightGrams ? Number(netWeightGrams) : null,
+          totalDiamondCt: totalDiamondCt ? Number(totalDiamondCt) : null,
+          totalDiamondPcs: totalDiamondPcs ? Number(totalDiamondPcs) : null,
+          diamondGrade: diamondGrade || null,
+          isPublished,
+          inStock,
         });
 
         // Create any metal variants that are newly enabled but don't exist yet
@@ -558,16 +705,19 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
         // Step 1: Create product (no images)
         const prodRes = await apiClient.post('/products', {
-          name, slug, sku: sku || undefined,
-          categoryId, subcategoryId: subcategoryId || undefined,
+          name,
+          sku: sku.trim() ? sku.trim() : null,
+          categoryId,
+          subcategoryId: subcategoryId || null,
           price: Number(price),
-          originalPrice: originalPrice ? Number(originalPrice) : undefined,
-          description: description || undefined,
-          netWeightGrams: netWeightGrams ? Number(netWeightGrams) : undefined,
-          totalDiamondCt: totalDiamondCt ? Number(totalDiamondCt) : undefined,
-          totalDiamondPcs: totalDiamondPcs ? Number(totalDiamondPcs) : undefined,
-          diamondGrade: diamondGrade || undefined,
-          isPublished, inStock,
+          originalPrice: originalPrice.trim() ? Number(originalPrice) : null,
+          description: description || null,
+          netWeightGrams: netWeightGrams ? Number(netWeightGrams) : null,
+          totalDiamondCt: totalDiamondCt ? Number(totalDiamondCt) : null,
+          totalDiamondPcs: totalDiamondPcs ? Number(totalDiamondPcs) : null,
+          diamondGrade: diamondGrade || null,
+          isPublished,
+          inStock,
         });
 
         const newProduct: Product = prodRes.data.data || prodRes.data;
@@ -639,19 +789,12 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         <div className="rounded-xl border border-graphite-200 bg-white p-4 space-y-4">
           <div className="text-xs font-bold uppercase tracking-wider text-graphite-500">Product Information</div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div>
             <Input
               label="Product Title"
               placeholder="e.g. Solitaire Diamond Ring"
               value={name}
               onChange={e => handleNameChange(e.target.value)}
-              required
-            />
-            <Input
-              label="URL Slug"
-              placeholder="solitaire-diamond-ring"
-              value={slug}
-              onChange={e => setSlug(e.target.value)}
               required
             />
           </div>
@@ -801,11 +944,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   <VariantImagePanel
                     section={s}
                     productId={product.id}
+                    totalProductImagesCount={totalImages}
                     onChange={handleVariantImagesUpdate}
                   />
                 ) : (
                   <PendingImagePanel
                     section={s}
+                    totalProductImagesCount={totalImages}
                     onChange={handlePendingImagesUpdate}
                   />
                 )}

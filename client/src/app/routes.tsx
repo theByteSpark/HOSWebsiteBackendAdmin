@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
@@ -24,6 +24,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/website" element={<WebsitePage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/audit-logs" element={<Navigate to="/settings?tab=audit" replace />} />
+        <Route path="/admin-users" element={<Navigate to="/settings?tab=users" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/products" replace />} />

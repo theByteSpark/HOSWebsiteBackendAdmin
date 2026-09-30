@@ -946,7 +946,7 @@ const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) 
         </div>
         <ImageUploader
           label="Hero Cover Image"
-          aspectRatioGuidance="Recommended: Desktop 16:9"
+          uploadContext="ABOUT_HERO"
           value={content.hero?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
         />
@@ -971,7 +971,7 @@ const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) 
         </div>
         <ImageUploader
           label="Section Image"
-          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          uploadContext="ABOUT_SECTION_PORTRAIT"
           value={content.maths?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, maths: { ...content.maths, image: url } } })}
         />
@@ -996,7 +996,7 @@ const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) 
         </div>
         <ImageUploader
           label="Section Image"
-          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          uploadContext="ABOUT_SECTION_PORTRAIT"
           value={content.worn?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, worn: { ...content.worn, image: url } } })}
         />
@@ -1012,7 +1012,7 @@ const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) 
         />
         <ImageUploader
           label="Founders Image"
-          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          uploadContext="ABOUT_SECTION_PORTRAIT"
           value={content.founder?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, founder: { ...content.founder, image: url } } })}
         />
@@ -1037,7 +1037,7 @@ const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) 
         </div>
         <ImageUploader
           label="Section Image"
-          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          uploadContext="ABOUT_SECTION_PORTRAIT"
           value={content.experience?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, experience: { ...content.experience, image: url } } })}
         />
@@ -1122,7 +1122,7 @@ const GiftingPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }
         />
         <ImageUploader
           label="Hero Image"
-          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          uploadContext="GIFTING_HERO"
           value={content.hero?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
         />
@@ -1318,7 +1318,7 @@ const DiamondEducationContentEditor: React.FC<{ onSaved: () => void }> = ({ onSa
         />
         <ImageUploader
           label="Hero Banner Image"
-          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          uploadContext="DIAMOND_HERO"
           value={content.hero?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
         />
@@ -1343,7 +1343,7 @@ const DiamondEducationContentEditor: React.FC<{ onSaved: () => void }> = ({ onSa
         </div>
         <ImageUploader
           label="Section Image"
-          aspectRatioGuidance="Recommended: 4:3"
+          uploadContext="DIAMOND_SECTION"
           value={content.whatAreLabGrown?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, whatAreLabGrown: { ...content.whatAreLabGrown, image: url } } })}
         />
@@ -1423,7 +1423,7 @@ const GoldVermeilContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }
         />
         <ImageUploader
           label="Hero Image"
-          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          uploadContext="GOLD_VERMEIL_HERO"
           value={content.hero?.image || ''}
           onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
         />
@@ -1479,7 +1479,7 @@ const HeroSlideModal: React.FC<{ slide: HeroSlide | null; isOpen: boolean; onClo
 
         <ImageUploader
           label="Hero Banner Image"
-          aspectRatioGuidance="Recommended: Desktop 16:9 (1920 × 1080 px)"
+          uploadContext="HOME_HERO_SLIDE"
           value={image}
           onChange={(url) => setImage(url)}
         />
@@ -1603,7 +1603,7 @@ const BlogModal: React.FC<{ post: BlogPost | null; isOpen: boolean; onClose: () 
 
         <ImageUploader
           label="Article Cover Image"
-          aspectRatioGuidance="Recommended: 16:9 (1200 × 675 px)"
+          uploadContext="BLOG_COVER"
           value={imageUrl}
           onChange={(url) => setImageUrl(url)}
         />
@@ -1695,16 +1695,29 @@ const FaqModal: React.FC<{ faq: FAQ | null; categories: ProductCategory[]; isOpe
 };
 
 const CategoryModal: React.FC<{ category: ProductCategory | null; isOpen: boolean; onClose: () => void; onSaved: () => void }> = ({ category, isOpen, onClose, onSaved }) => {
-  const [name, setName] = useState(category?.name || '');
-  const [slug, setSlug] = useState(category?.slug || '');
-  const [image, setImage] = useState(category?.image || '');
-  const [sortOrder, setSortOrder] = useState(category?.sortOrder || 0);
-  const [isPublished, setIsPublished] = useState(category?.isPublished ?? true);
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [image, setImage] = useState('');
+  const [sortOrder, setSortOrder] = useState(0);
+  const [isPublished, setIsPublished] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setName(category?.name || '');
+      setSlug(category?.slug || '');
+      setImage(category?.image || '');
+      setSortOrder(category?.sortOrder || 0);
+      setIsPublished(category?.isPublished ?? true);
+      setError(null);
+    }
+  }, [category, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     const catSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const payload = { name, slug: catSlug, image, sortOrder: Number(sortOrder), isPublished };
     try {
@@ -1715,8 +1728,8 @@ const CategoryModal: React.FC<{ category: ProductCategory | null; isOpen: boolea
       }
       onSaved();
       onClose();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Failed to save category');
     } finally {
       setLoading(false);
     }
@@ -1725,12 +1738,17 @@ const CategoryModal: React.FC<{ category: ProductCategory | null; isOpen: boolea
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={category ? 'Edit Category' : 'Add Category'}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
+            {error}
+          </div>
+        )}
         <Input label="Category Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Input label="URL Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
 
         <ImageUploader
           label="Category Cover Image"
-          aspectRatioGuidance="Recommended: 1:1 Square or 4:3"
+          uploadContext="CATEGORY_COVER"
           value={image}
           onChange={(url) => setImage(url)}
         />
@@ -1750,16 +1768,29 @@ const CategoryModal: React.FC<{ category: ProductCategory | null; isOpen: boolea
 };
 
 const SubcategoryModal: React.FC<{ subcategory: Subcategory | null; categories: ProductCategory[]; isOpen: boolean; onClose: () => void; onSaved: () => void }> = ({ subcategory, categories, isOpen, onClose, onSaved }) => {
-  const [categoryId, setCategoryId] = useState(subcategory?.categoryId || categories[0]?.id || '');
-  const [name, setName] = useState(subcategory?.name || '');
-  const [slug, setSlug] = useState(subcategory?.slug || '');
-  const [sortOrder, setSortOrder] = useState(subcategory?.sortOrder || 0);
-  const [isPublished, setIsPublished] = useState(subcategory?.isPublished ?? true);
+  const [categoryId, setCategoryId] = useState('');
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [sortOrder, setSortOrder] = useState(0);
+  const [isPublished, setIsPublished] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setCategoryId(subcategory?.categoryId || categories[0]?.id || '');
+      setName(subcategory?.name || '');
+      setSlug(subcategory?.slug || '');
+      setSortOrder(subcategory?.sortOrder || 0);
+      setIsPublished(subcategory?.isPublished ?? true);
+      setError(null);
+    }
+  }, [subcategory, categories, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     const subSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const payload = { categoryId, name, slug: subSlug, sortOrder: Number(sortOrder), isPublished };
     try {
@@ -1770,8 +1801,8 @@ const SubcategoryModal: React.FC<{ subcategory: Subcategory | null; categories: 
       }
       onSaved();
       onClose();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Failed to save subcategory');
     } finally {
       setLoading(false);
     }
@@ -1780,6 +1811,11 @@ const SubcategoryModal: React.FC<{ subcategory: Subcategory | null; categories: 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={subcategory ? 'Edit Subcategory' : 'Add Subcategory'}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
+            {error}
+          </div>
+        )}
         <Select
           label="Parent Category"
           value={categoryId}

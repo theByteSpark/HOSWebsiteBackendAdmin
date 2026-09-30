@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   getProducts,
-  getProductByIdOrSlug,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -20,7 +20,7 @@ const router = Router();
 
 // ── Public / Storefront Read Routes ──────────────────────────
 router.get('/', getProducts);
-router.get('/:idOrSlug', getProductByIdOrSlug);
+router.get('/:id', getProductById);
 
 // ── Admin Product Routes ──────────────────────────────────────
 router.post('/', authenticateAdmin, requireAdmin, createProduct);
