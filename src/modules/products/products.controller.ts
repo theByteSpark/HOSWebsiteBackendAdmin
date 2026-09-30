@@ -53,9 +53,13 @@ export const getProducts = async (req: Request, res: Response) => {
           category: { select: { id: true, name: true, slug: true } },
           subcategory: { select: { id: true, name: true, slug: true } },
           images: { orderBy: { sortOrder: 'asc' } },
-          variants: true,
+          variants: {
+            include: {
+              images: { orderBy: { sortOrder: 'asc' } },
+            },
+            orderBy: { metalFinish: 'asc' },
+          },
           seo: true,
-          inventory: true,
         },
         orderBy: { [sortBy]: sortOrder === 'asc' ? 'asc' : 'desc' },
       }),
@@ -85,9 +89,13 @@ export const getProductByIdOrSlug = async (req: Request, res: Response) => {
         category: true,
         subcategory: true,
         images: { orderBy: { sortOrder: 'asc' } },
-        variants: true,
+        variants: {
+          include: {
+            images: { orderBy: { sortOrder: 'asc' } },
+          },
+          orderBy: { isDefault: 'desc' },
+        },
         seo: true,
-        inventory: true,
       },
     });
 
@@ -168,9 +176,10 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
         category: true,
         subcategory: true,
         images: true,
-        variants: true,
+        variants: {
+          include: { images: true },
+        },
         seo: true,
-        inventory: true,
       },
     });
 
@@ -286,9 +295,10 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
         category: true,
         subcategory: true,
         images: { orderBy: { sortOrder: 'asc' } },
-        variants: true,
+        variants: {
+          include: { images: { orderBy: { sortOrder: 'asc' } } },
+        },
         seo: true,
-        inventory: true,
       },
     });
 
@@ -359,5 +369,136 @@ export const publishProduct = async (req: AuthenticatedRequest, res: Response) =
     return sendSuccess(res, updated, `Product ${updated.isPublished ? 'published' : 'unpublished'} successfully`);
   } catch (error) {
     return sendError(res, 'Failed to update product publish status', 500, error);
+  }
+};
+
+// ============================================================
+// VARIANT CRUD
+// ============================================================
+
+export const createVariant = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const productId = String(req.params.id);
+    const { metalFinish, swatchColor, priceOffset, isDefault, inStock, sku } = req.body;
+
+    if (!metalFinish) return sendError(res, 'metalFinish is required', 400);
+
+    const existing = await prisma.product.findUnique({ where: { id: productId } });
+    if (!existing || existing.deletedAt) return sendError(res, 'Product not found', 404);
+
+    const variant = await prisma.productVariant.create({
+      data: { productId, metalFinish, swatchColor, priceOffset, isDefault: isDefault || false, inStock: inStock !== false, sku },
+      include: { images: { orderBy: { sortOrder: 'asc' } } },
+    });
+    return sendSuccess(res, variant, 'Variant created', 201);
+  } catch (error) {
+    return sendError(res, 'Failed to create variant', 500, error);
+  }
+};
+
+export const updateVariant = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const variantId = String(req.params.variantId);
+    const { metalFinish, swatchColor, priceOffset, isDefault, inStock, sku } = req.body;
+
+    const variant = await prisma.productVariant.findUnique({ where: { id: variantId } });
+    if (!variant) return sendError(res, 'Variant not found', 404);
+
+    const updated = await prisma.productVariant.update({
+      where: { id: variantId },
+      data: {
+        ...(metalFinish !== undefined && { metalFinish }),
+        ...(swatchColor !== undefined && { swatchColor }),
+        ...(priceOffset !== undefined && { priceOffset }),
+        ...(isDefault !== undefined && { isDefault }),
+        ...(inStock !== undefined && { inStock }),
+        ...(sku !== undefined && { sku }),
+      },
+      include: { images: { orderBy: { sortOrder: 'asc' } } },
+    });
+    return sendSuccess(res, updated, 'Variant updated');
+  } catch (error) {
+    return sendError(res, 'Failed to update variant', 500, error);
+  }
+};
+
+export const deleteVariant = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const variantId = String(req.params.variantId);
+    const variant = await prisma.productVariant.findUnique({ where: { id: variantId } });
+    if (!variant) return sendError(res, 'Variant not found', 404);
+
+    await prisma.productVariant.delete({ where: { id: variantId } });
+    return sendSuccess(res, null, 'Variant deleted');
+  } catch (error) {
+    return sendError(res, 'Failed to delete variant', 500, error);
+  }
+};
+
+// ============================================================
+// VARIANT IMAGE CRUD
+// ============================================================
+
+export const addVariantImage = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const variantId = String(req.params.variantId);
+    const { url, altText, sortOrder, isPrimary } = req.body;
+
+    if (!url) return sendError(res, 'url is required', 400);
+
+    const variant = await prisma.productVariant.findUnique({ where: { id: variantId } });
+    if (!variant) return sendError(res, 'Variant not found', 404);
+
+    // If this is set as primary, clear existing primary
+    if (isPrimary) {
+      await prisma.variantImage.updateMany({ where: { variantId, isPrimary: true }, data: { isPrimary: false } });
+    }
+
+    const image = await prisma.variantImage.create({
+      data: { variantId, url, altText, sortOrder: sortOrder ?? 0, isPrimary: isPrimary || false },
+    });
+    return sendSuccess(res, image, 'Image added', 201);
+  } catch (error) {
+    return sendError(res, 'Failed to add image', 500, error);
+  }
+};
+
+export const deleteVariantImage = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const imageId = String(req.params.imageId);
+    const img = await prisma.variantImage.findUnique({ where: { id: imageId } });
+    if (!img) return sendError(res, 'Image not found', 404);
+
+    await prisma.variantImage.delete({ where: { id: imageId } });
+    return sendSuccess(res, null, 'Image deleted');
+  } catch (error) {
+    return sendError(res, 'Failed to delete image', 500, error);
+  }
+};
+
+// Body: { images: [{ id, sortOrder, isPrimary }] }
+export const reorderVariantImages = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const variantId = String(req.params.variantId);
+    const { images } = req.body as { images: { id: string; sortOrder: number; isPrimary?: boolean }[] };
+
+    if (!Array.isArray(images)) return sendError(res, 'images array required', 400);
+
+    await prisma.$transaction(
+      images.map((img) =>
+        prisma.variantImage.update({
+          where: { id: img.id },
+          data: { sortOrder: img.sortOrder, ...(img.isPrimary !== undefined && { isPrimary: img.isPrimary }) },
+        })
+      )
+    );
+
+    const updated = await prisma.variantImage.findMany({
+      where: { variantId },
+      orderBy: { sortOrder: 'asc' },
+    });
+    return sendSuccess(res, updated, 'Images reordered');
+  } catch (error) {
+    return sendError(res, 'Failed to reorder images', 500, error);
   }
 };

@@ -146,6 +146,16 @@ export interface ProductImage {
   isHover: boolean;
 }
 
+export interface VariantImage {
+  id: string;
+  variantId: string;
+  url: string;
+  altText?: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+  createdAt: string;
+}
+
 export interface ProductVariant {
   id: string;
   productId: string;
@@ -154,6 +164,8 @@ export interface ProductVariant {
   priceOffset?: number | string | null;
   isDefault: boolean;
   inStock: boolean;
+  sku?: string | null;
+  images: VariantImage[];
 }
 
 export interface ProductSEO {

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { apiClient } from '@/lib/apiClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs, Modal, ConfirmDialog } from '@/components/ui/Modal';
@@ -7,8 +8,9 @@ import { Table, Column } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
+import { ImageUploader } from '@/components/ui/ImageUploader';
 import { formatDate } from '@/lib/format';
-import type { HeroSlide, Review, BlogPost, FAQ, MediaAsset, ProductCategory, Subcategory, NavigationItem } from '@/types';
+import type { HeroSlide, Review, BlogPost, FAQ, MediaAsset, ProductCategory, Subcategory } from '@/types';
 import {
   Globe,
   Sliders,
@@ -23,11 +25,24 @@ import {
   Upload,
   FolderTree,
   Layout,
-  Navigation,
+  CheckCircle,
+  AlertCircle,
+  Save,
+  Info,
+  Gift,
+  BookOpen,
+  Sparkles,
+  Home,
+  Gem,
 } from 'lucide-react';
 
 export const WebsitePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('hero');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'home';
+
+  const setActiveTab = (tab: string) => {
+    setSearchParams({ tab });
+  };
 
   // Modals state
   const [editingHero, setEditingHero] = useState<HeroSlide | null>(null);
@@ -54,16 +69,9 @@ export const WebsitePage: React.FC = () => {
   const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
   const [deletingSubcategory, setDeletingSubcategory] = useState<Subcategory | null>(null);
 
-  const [editingNavItem, setEditingNavItem] = useState<NavigationItem | null>(null);
-  const [isNavModalOpen, setIsNavModalOpen] = useState(false);
-  const [deletingNavItem, setDeletingNavItem] = useState<NavigationItem | null>(null);
-
-  const [editingPage, setEditingPage] = useState<any | null>(null);
-  const [isPageModalOpen, setIsPageModalOpen] = useState(false);
-
-  const [deletingMedia, setDeletingMedia] = useState<MediaAsset | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // Queries
   const { data: heroData, isLoading: heroLoading, refetch: refetchHero } = useQuery<{ slides: HeroSlide[] }>({
@@ -72,7 +80,7 @@ export const WebsitePage: React.FC = () => {
       const res = await apiClient.get('/cms/hero-slides');
       return res.data.data || res.data;
     },
-    enabled: activeTab === 'hero',
+    enabled: activeTab === 'home',
   });
 
   const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useQuery<{ reviews: Review[] }>({
@@ -108,37 +116,18 @@ export const WebsitePage: React.FC = () => {
       const res = await apiClient.get('/categories');
       return res.data.data || res.data;
     },
-    enabled: activeTab === 'categories',
+    enabled: activeTab === 'collections',
   });
 
-  const { data: pagesData, isLoading: pagesLoading, refetch: refetchPages } = useQuery<{ pages: any[] }>({
-    queryKey: ['cms-pages'],
+  const { data: settingsData, refetch: refetchSettings } = useQuery({
+    queryKey: ['site-settings'],
     queryFn: async () => {
-      const res = await apiClient.get('/cms/pages');
+      const res = await apiClient.get('/settings');
       return res.data.data || res.data;
     },
-    enabled: activeTab === 'pages',
   });
 
-  const { data: navData, isLoading: navLoading, refetch: refetchNav } = useQuery<{ navigation: NavigationItem[] }>({
-    queryKey: ['cms-navigation'],
-    queryFn: async () => {
-      const res = await apiClient.get('/cms/navigation');
-      return res.data.data || res.data;
-    },
-    enabled: activeTab === 'navigation',
-  });
-
-  const { data: mediaData, isLoading: mediaLoading, refetch: refetchMedia } = useQuery<{ assets: MediaAsset[] }>({
-    queryKey: ['media-assets'],
-    queryFn: async () => {
-      const res = await apiClient.get('/media');
-      return res.data.data || res.data;
-    },
-    enabled: activeTab === 'media',
-  });
-
-  // Toggles
+  // Actions
   const handleToggleHeroActive = async (slide: HeroSlide) => {
     try {
       await apiClient.put(`/cms/hero-slides/${slide.id}`, { isActive: !slide.isActive });
@@ -175,7 +164,6 @@ export const WebsitePage: React.FC = () => {
     }
   };
 
-  // Delete Actions
   const handleDeleteHero = async () => {
     if (!deletingHero) return;
     setIsSubmitting(true);
@@ -262,81 +250,7 @@ export const WebsitePage: React.FC = () => {
     }
   };
 
-  const handleDeleteNavItem = async () => {
-    if (!deletingNavItem) return;
-    setIsSubmitting(true);
-    try {
-      await apiClient.delete(`/cms/navigation/${deletingNavItem.id}`);
-      setDeletingNavItem(null);
-      refetchNav();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDeleteMedia = async () => {
-    if (!deletingMedia) return;
-    setIsSubmitting(true);
-    try {
-      await apiClient.delete(`/media/${deletingMedia.id}`);
-      setDeletingMedia(null);
-      refetchMedia();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Columns Definitions
-  const heroColumns: Column<HeroSlide>[] = [
-    {
-      header: 'Slide Preview',
-      accessor: (row) => (
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-20 rounded-md bg-graphite-100 overflow-hidden border border-graphite-200 shrink-0">
-            <img src={row.image} alt={row.title} className="h-full w-full object-cover" />
-          </div>
-          <div>
-            <p className="font-bold text-graphite-900">{row.title}</p>
-            <p className="text-xs text-graphite-400">{row.tagline || 'No tagline'}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      header: 'Target Link',
-      accessor: (row) => <span className="text-xs font-mono text-graphite-600">{row.href}</span>,
-    },
-    {
-      header: 'Sort Order',
-      accessor: (row) => <span className="text-xs font-semibold text-graphite-700">{row.sortOrder}</span>,
-    },
-    {
-      header: 'Status',
-      accessor: (row) => (
-        <button type="button" onClick={() => handleToggleHeroActive(row)} className="cursor-pointer">
-          <StatusBadge status={row.isActive ? 'ACTIVE' : 'INACTIVE'} />
-        </button>
-      ),
-    },
-    {
-      header: 'Actions',
-      accessor: (row) => (
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => { setEditingHero(row); setIsHeroModalOpen(true); }}>
-            <Edit2 className="h-3.5 w-3.5 mr-1" /> Edit
-          </Button>
-          <Button size="sm" variant="destructive" onClick={() => setDeletingHero(row)}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
+  // Table Columns
   const reviewColumns: Column<Review>[] = [
     {
       header: 'Client & Rating',
@@ -369,7 +283,7 @@ export const WebsitePage: React.FC = () => {
       accessor: (row) => <span className="text-xs text-graphite-600">{row.productName || 'General Brand'}</span>,
     },
     {
-      header: 'Moderation Status',
+      header: 'Status',
       accessor: (row) => (
         <button type="button" onClick={() => handleToggleReviewPublish(row)} className="cursor-pointer">
           <StatusBadge status={row.isPublished ? 'PUBLISHED' : 'DRAFT'} />
@@ -402,7 +316,7 @@ export const WebsitePage: React.FC = () => {
       ),
     },
     {
-      header: 'Publish Status',
+      header: 'Status',
       accessor: (row) => (
         <button type="button" onClick={() => handleToggleBlogPublish(row)} className="cursor-pointer">
           <StatusBadge status={row.isPublished ? 'PUBLISHED' : 'DRAFT'} />
@@ -434,12 +348,9 @@ export const WebsitePage: React.FC = () => {
       accessor: (row) => <span className="font-bold text-graphite-900">{row.question}</span>,
     },
     {
-      header: 'Category / Context',
+      header: 'Context',
       accessor: (row) => (
-        <div className="text-xs">
-          <span className="font-semibold text-graphite-700">{row.category?.name || 'General'}</span>
-          <p className="text-[10px] text-graphite-400 uppercase tracking-wide">{row.context}</p>
-        </div>
+        <span className="text-xs font-semibold text-graphite-700 uppercase tracking-wider">{row.context}</span>
       ),
     },
     {
@@ -468,54 +379,141 @@ export const WebsitePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Website Content & CMS"
-        description="Manage storefront content, hero carousel slides, customer reviews, journal blogs, pages, navigation, and media."
+        title="Page Content Manager"
+        description="Visual content editor for House of Seya website pages. Edit every visible text and replace every image."
       />
 
       {errorMsg && (
-        <div className="rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200">
-          {errorMsg}
+        <div className="rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
+      {successMsg && (
+        <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-800 border border-emerald-200 flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600" />
+          <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Main Tabs Navigation */}
       <Tabs
         tabs={[
-          { id: 'hero', label: 'Hero Slides' },
-          { id: 'categories', label: 'Categories & Subcategories' },
-          { id: 'reviews', label: 'Customer Reviews' },
-          { id: 'blogs', label: 'Journal & Blogs' },
+          { id: 'home', label: 'Home Page' },
+          { id: 'about', label: 'About Page' },
+          { id: 'gifting', label: 'Gifting Page' },
+          { id: 'customise', label: 'Customise Page' },
+          { id: 'diamond-education', label: 'Diamond Education' },
+          { id: 'gold-vermeil', label: 'Gold Vermeil' },
+          { id: 'blogs', label: 'Blogs' },
+          { id: 'collections', label: 'Collections' },
           { id: 'faqs', label: 'FAQs' },
-          { id: 'pages', label: 'Structured Pages' },
-          { id: 'navigation', label: 'Navigation Menu' },
-          { id: 'media', label: 'Media Library' },
+          { id: 'reviews', label: 'Reviews' },
         ]}
         activeTab={activeTab}
         onChange={setActiveTab}
       />
 
-      {/* Hero Slides */}
-      {activeTab === 'hero' && (
+      {/* 1. HOME PAGE */}
+      {activeTab === 'home' && (
+        <HomePageEditor
+          settings={settingsData}
+          heroSlides={heroData?.slides || []}
+          heroLoading={heroLoading}
+          onAddSlide={() => { setEditingHero(null); setIsHeroModalOpen(true); }}
+          onEditSlide={(slide) => { setEditingHero(slide); setIsHeroModalOpen(true); }}
+          onDeleteSlide={(slide) => setDeletingHero(slide)}
+          onToggleSlideActive={handleToggleHeroActive}
+          onSaved={() => {
+            refetchSettings();
+            refetchHero();
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 2. ABOUT PAGE */}
+      {activeTab === 'about' && (
+        <AboutPageContentEditor
+          onSaved={() => {
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 3. GIFTING PAGE */}
+      {activeTab === 'gifting' && (
+        <GiftingPageContentEditor
+          onSaved={() => {
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 4. CUSTOMISE PAGE */}
+      {activeTab === 'customise' && (
+        <CustomisePageContentEditor
+          onSaved={() => {
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 5. DIAMOND EDUCATION */}
+      {activeTab === 'diamond-education' && (
+        <DiamondEducationContentEditor
+          onSaved={() => {
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 6. GOLD VERMEIL */}
+      {activeTab === 'gold-vermeil' && (
+        <GoldVermeilContentEditor
+          onSaved={() => {
+            setSuccessMsg('Changes saved successfully!');
+            setTimeout(() => setSuccessMsg(null), 3000);
+          }}
+        />
+      )}
+
+      {/* 7. BLOGS */}
+      {activeTab === 'blogs' && (
         <div className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { setEditingHero(null); setIsHeroModalOpen(true); }}>
-              <Plus className="h-4 w-4 mr-1" /> Add Hero Slide
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-graphite-200">
+            <div>
+              <h3 className="font-bold text-graphite-900 text-sm">Journal & Blog Articles</h3>
+              <p className="text-xs text-graphite-400">Publish and edit blog posts displayed on the website.</p>
+            </div>
+            <Button size="sm" onClick={() => { setEditingBlog(null); setIsBlogModalOpen(true); }}>
+              <Plus className="h-4 w-4 mr-1" /> Add Journal Article
             </Button>
           </div>
           <Table
-            columns={heroColumns}
-            data={heroData?.slides || []}
+            columns={blogColumns}
+            data={blogsData?.posts || []}
             keyExtractor={(row) => row.id}
-            isLoading={heroLoading}
-            emptyMessage="No hero carousel slides configured."
+            isLoading={blogsLoading}
+            emptyMessage="No journal blog posts published."
           />
         </div>
       )}
 
-      {/* Categories & Subcategories */}
-      {activeTab === 'categories' && (
+      {/* 8. COLLECTIONS */}
+      {activeTab === 'collections' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-graphite-900">Taxonomy & Category Structure</h3>
+          <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-graphite-200">
+            <div>
+              <h3 className="text-sm font-bold text-graphite-900">Collections & Category Taxonomy</h3>
+              <p className="text-xs text-graphite-400">Manage collection names, descriptions, and cover images.</p>
+            </div>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => { setEditingSubcategory(null); setIsSubcategoryModalOpen(true); }}>
                 <Plus className="h-4 w-4 mr-1" /> Add Subcategory
@@ -554,7 +552,7 @@ export const WebsitePage: React.FC = () => {
                   </div>
 
                   {cat.image && (
-                    <div className="h-24 w-full rounded-lg bg-graphite-100 overflow-hidden border border-graphite-100">
+                    <div className="h-28 w-full rounded-lg bg-graphite-100 overflow-hidden border border-graphite-100">
                       <img src={cat.image} alt={cat.name} className="h-full w-full object-cover" />
                     </div>
                   )}
@@ -597,46 +595,14 @@ export const WebsitePage: React.FC = () => {
         </div>
       )}
 
-      {/* Customer Reviews */}
-      {activeTab === 'reviews' && (
-        <div className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { setEditingReview(null); setIsReviewModalOpen(true); }}>
-              <Plus className="h-4 w-4 mr-1" /> Add Customer Review
-            </Button>
-          </div>
-          <Table
-            columns={reviewColumns}
-            data={reviewsData?.reviews || []}
-            keyExtractor={(row) => row.id}
-            isLoading={reviewsLoading}
-            emptyMessage="No customer reviews submitted."
-          />
-        </div>
-      )}
-
-      {/* Blogs */}
-      {activeTab === 'blogs' && (
-        <div className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { setEditingBlog(null); setIsBlogModalOpen(true); }}>
-              <Plus className="h-4 w-4 mr-1" /> Add Journal Article
-            </Button>
-          </div>
-          <Table
-            columns={blogColumns}
-            data={blogsData?.posts || []}
-            keyExtractor={(row) => row.id}
-            isLoading={blogsLoading}
-            emptyMessage="No journal blog posts published."
-          />
-        </div>
-      )}
-
-      {/* FAQs */}
+      {/* 9. FAQS */}
       {activeTab === 'faqs' && (
         <div className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-graphite-200">
+            <div>
+              <h3 className="font-bold text-graphite-900 text-sm">Frequently Asked Questions</h3>
+              <p className="text-xs text-graphite-400">Manage questions and answers displayed across pages.</p>
+            </div>
             <Button size="sm" onClick={() => { setEditingFaq(null); setIsFaqModalOpen(true); }}>
               <Plus className="h-4 w-4 mr-1" /> Add FAQ Item
             </Button>
@@ -651,172 +617,29 @@ export const WebsitePage: React.FC = () => {
         </div>
       )}
 
-      {/* Structured Pages */}
-      {activeTab === 'pages' && (
+      {/* 10. REVIEWS */}
+      {activeTab === 'reviews' && (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pagesLoading ? (
-              <p className="col-span-full py-8 text-center text-xs text-graphite-400">Loading structured pages...</p>
-            ) : (
-              (pagesData?.pages || []).map((page) => (
-                <div key={page.id} className="rounded-xl border border-graphite-200 bg-white p-5 flex items-start justify-between shadow-2xs">
-                  <div>
-                    <h3 className="font-bold text-graphite-900 text-sm">{page.title}</h3>
-                    <p className="text-xs font-mono text-graphite-400">/{page.slug}</p>
-                    <div className="mt-2">
-                      <StatusBadge status={page.isPublished ? 'PUBLISHED' : 'DRAFT'} />
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEditingPage(page);
-                      setIsPageModalOpen(true);
-                    }}
-                  >
-                    <Edit2 className="h-3.5 w-3.5 mr-1" /> Edit Content
-                  </Button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Website Navigation */}
-      {activeTab === 'navigation' && (
-        <div className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { setEditingNavItem(null); setIsNavModalOpen(true); }}>
-              <Plus className="h-4 w-4 mr-1" /> Add Navigation Item
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-graphite-200">
+            <div>
+              <h3 className="font-bold text-graphite-900 text-sm">Customer Reviews & Testimonials</h3>
+              <p className="text-xs text-graphite-400">Moderate customer reviews shown on homepage & product pages.</p>
+            </div>
+            <Button size="sm" onClick={() => { setEditingReview(null); setIsReviewModalOpen(true); }}>
+              <Plus className="h-4 w-4 mr-1" /> Add Customer Review
             </Button>
           </div>
-
-          {navLoading ? (
-            <p className="py-8 text-center text-xs text-graphite-400">Loading navigation menu...</p>
-          ) : (
-            <div className="rounded-xl border border-graphite-200 bg-white divide-y divide-graphite-100">
-              {(navData?.navigation || []).map((item) => (
-                <div key={item.id} className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Navigation className="h-4 w-4 text-brand-700" />
-                      <div>
-                        <span className="font-bold text-graphite-900 text-sm">{item.label}</span>
-                        <span className="text-xs font-mono text-graphite-400 ml-2">{item.href}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <StatusBadge status={item.isActive ? 'ACTIVE' : 'INACTIVE'} />
-                      <Button size="sm" variant="outline" onClick={() => { setEditingNavItem(item); setIsNavModalOpen(true); }}>
-                        Edit
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => setDeletingNavItem(item)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {item.children && item.children.length > 0 && (
-                    <div className="pl-7 space-y-1 border-l-2 border-graphite-100 ml-2">
-                      {item.children.map((child) => (
-                        <div key={child.id} className="flex items-center justify-between py-1 text-xs">
-                          <div>
-                            <span className="font-medium text-graphite-800">{child.label}</span>
-                            <span className="font-mono text-graphite-400 ml-2">{child.href}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => { setEditingNavItem(child); setIsNavModalOpen(true); }}
-                              className="p-1 text-graphite-400 hover:text-graphite-700"
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => setDeletingNavItem(child)}
-                              className="p-1 text-red-400 hover:text-red-700"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <Table
+            columns={reviewColumns}
+            data={reviewsData?.reviews || []}
+            keyExtractor={(row) => row.id}
+            isLoading={reviewsLoading}
+            emptyMessage="No customer reviews submitted."
+          />
         </div>
       )}
 
-      {/* Media Library */}
-      {activeTab === 'media' && (
-        <div className="space-y-4">
-          <div className="flex justify-end">
-            <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-brand-700 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-800">
-              <Upload className="h-3.5 w-3.5" /> Upload Media File
-              <input
-                type="file"
-                accept="image/*,video/mp4"
-                className="hidden"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('folder', 'general');
-                    try {
-                      await apiClient.post('/media/upload', formData, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
-                      });
-                      refetchMedia();
-                    } catch (err) {
-                      console.error('Failed to upload media', err);
-                    }
-                  }
-                }}
-              />
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-            {mediaLoading ? (
-              <p className="col-span-full py-8 text-center text-xs text-graphite-400">Loading media library...</p>
-            ) : !mediaData?.assets || mediaData.assets.length === 0 ? (
-              <div className="col-span-full rounded-xl border border-graphite-200 bg-white p-12 text-center text-xs text-graphite-500">
-                <ImageIcon className="mx-auto h-8 w-8 text-graphite-300 mb-2" />
-                No media assets uploaded yet.
-              </div>
-            ) : (
-              mediaData.assets.map((asset) => (
-                <div key={asset.id} className="rounded-xl border border-graphite-200 bg-white overflow-hidden group shadow-2xs relative">
-                  <div className="aspect-square bg-graphite-100 overflow-hidden">
-                    <img src={asset.url} alt={asset.altText || asset.filename} className="h-full w-full object-cover" />
-                  </div>
-                  <div className="p-2 text-[11px] flex items-center justify-between">
-                    <div className="truncate">
-                      <p className="truncate font-semibold text-graphite-800">{asset.originalName || asset.filename}</p>
-                      <p className="text-graphite-400 text-[10px]">{asset.folder || 'general'}</p>
-                    </div>
-                    <button
-                      onClick={() => setDeletingMedia(asset)}
-                      className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ---------------- HARDWARE MODALS ---------------- */}
-
-      {/* Hero Slide Modal */}
+      {/* MODALS */}
       {isHeroModalOpen && (
         <HeroSlideModal
           slide={editingHero}
@@ -826,7 +649,6 @@ export const WebsitePage: React.FC = () => {
         />
       )}
 
-      {/* Review Modal */}
       {isReviewModalOpen && (
         <ReviewModal
           review={editingReview}
@@ -836,7 +658,6 @@ export const WebsitePage: React.FC = () => {
         />
       )}
 
-      {/* Blog Modal */}
       {isBlogModalOpen && (
         <BlogModal
           post={editingBlog}
@@ -846,7 +667,6 @@ export const WebsitePage: React.FC = () => {
         />
       )}
 
-      {/* FAQ Modal */}
       {isFaqModalOpen && (
         <FaqModal
           faq={editingFaq}
@@ -857,7 +677,6 @@ export const WebsitePage: React.FC = () => {
         />
       )}
 
-      {/* Category Modal */}
       {isCategoryModalOpen && (
         <CategoryModal
           category={editingCategory}
@@ -867,7 +686,6 @@ export const WebsitePage: React.FC = () => {
         />
       )}
 
-      {/* Subcategory Modal */}
       {isSubcategoryModalOpen && (
         <SubcategoryModal
           subcategory={editingSubcategory}
@@ -875,27 +693,6 @@ export const WebsitePage: React.FC = () => {
           isOpen={isSubcategoryModalOpen}
           onClose={() => setIsSubcategoryModalOpen(false)}
           onSaved={refetchCategories}
-        />
-      )}
-
-      {/* Navigation Modal */}
-      {isNavModalOpen && (
-        <NavModal
-          item={editingNavItem}
-          parentItems={navData?.navigation || []}
-          isOpen={isNavModalOpen}
-          onClose={() => setIsNavModalOpen(false)}
-          onSaved={refetchNav}
-        />
-      )}
-
-      {/* Page Content Modal */}
-      {isPageModalOpen && (
-        <PageModal
-          page={editingPage}
-          isOpen={isPageModalOpen}
-          onClose={() => setIsPageModalOpen(false)}
-          onSaved={refetchPages}
         />
       )}
 
@@ -953,30 +750,696 @@ export const WebsitePage: React.FC = () => {
         message={`Are you sure you want to delete subcategory "${deletingSubcategory?.name}"?`}
         isLoading={isSubmitting}
       />
-
-      <ConfirmDialog
-        isOpen={!!deletingNavItem}
-        onClose={() => setDeletingNavItem(null)}
-        onConfirm={handleDeleteNavItem}
-        title="Delete Navigation Item"
-        message={`Are you sure you want to delete navigation item "${deletingNavItem?.label}"?`}
-        isLoading={isSubmitting}
-      />
-
-      <ConfirmDialog
-        isOpen={!!deletingMedia}
-        onClose={() => setDeletingMedia(null)}
-        onConfirm={handleDeleteMedia}
-        title="Delete Media File"
-        message={`Are you sure you want to delete media file "${deletingMedia?.originalName || deletingMedia?.filename}"?`}
-        isLoading={isSubmitting}
-      />
     </div>
   );
 };
 
 // ----------------------------------------------------
-// SUB-MODAL COMPONENTS
+// 1. HOME PAGE CONTENT EDITOR
+// ----------------------------------------------------
+const HomePageEditor: React.FC<{
+  settings: any;
+  heroSlides: HeroSlide[];
+  heroLoading: boolean;
+  onAddSlide: () => void;
+  onEditSlide: (slide: HeroSlide) => void;
+  onDeleteSlide: (slide: HeroSlide) => void;
+  onToggleSlideActive: (slide: HeroSlide) => void;
+  onSaved: () => void;
+}> = ({ settings, heroSlides, heroLoading, onAddSlide, onEditSlide, onDeleteSlide, onToggleSlideActive, onSaved }) => {
+  const [videoHeading, setVideoHeading] = useState(settings?.diamondSectionHeading || 'Diamonds that don’t cost the Earth');
+  const [videoBody, setVideoBody] = useState(settings?.diamondSectionBody || 'Grown under conditions that mirror the earth’s.');
+  const [videoUrl, setVideoUrl] = useState(settings?.diamondSectionVideo || 'https://assets.mixkit.co/videos/preview/mixkit-jewelry-craftsman-polishing-a-ring-41546-large.mp4');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (settings) {
+      if (settings.diamondSectionHeading) setVideoHeading(settings.diamondSectionHeading);
+      if (settings.diamondSectionBody) setVideoBody(settings.diamondSectionBody);
+      if (settings.diamondSectionVideo) setVideoUrl(settings.diamondSectionVideo);
+    }
+  }, [settings]);
+
+  const handleSaveVideoSection = async () => {
+    setLoading(true);
+    try {
+      await apiClient.put('/settings', {
+        diamondSectionHeading: videoHeading,
+        diamondSectionBody: videoBody,
+        diamondSectionVideo: videoUrl,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Hero Slider Banners */}
+      <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-graphite-900">HERO SECTION BANNERS</h3>
+            <p className="text-xs text-graphite-500">Edit homepage hero banner images, headings, taglines, and call-to-action buttons.</p>
+          </div>
+          <Button size="sm" onClick={onAddSlide}>
+            <Plus className="h-4 w-4 mr-1" /> Add Hero Slide
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {heroLoading ? (
+            <p className="col-span-full py-4 text-center text-xs text-graphite-400">Loading hero slides...</p>
+          ) : heroSlides.length === 0 ? (
+            <p className="col-span-full py-4 text-center text-xs text-graphite-400 italic">No hero slides created yet.</p>
+          ) : (
+            heroSlides.map((slide) => (
+              <div key={slide.id} className="rounded-xl border border-graphite-200 bg-white p-4 space-y-3 flex items-start gap-4 shadow-2xs">
+                <div className="h-20 w-32 rounded-lg bg-graphite-100 overflow-hidden shrink-0 border border-graphite-200">
+                  <img src={slide.image} alt={slide.title} className="h-full w-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-graphite-900 text-sm truncate">{slide.title}</p>
+                  <p className="text-xs text-graphite-500 truncate">{slide.tagline || 'No tagline'}</p>
+                  <p className="text-[11px] font-mono text-brand-700 mt-1">{slide.href}</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <StatusBadge status={slide.isActive ? 'ACTIVE' : 'INACTIVE'} />
+                    <Button size="sm" variant="outline" onClick={() => onEditSlide(slide)}>
+                      Edit
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => onDeleteSlide(slide)}>
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Lab Diamonds Video Section */}
+      <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900 mb-1">LAB DIAMONDS FEATURE SECTION</h3>
+          <p className="text-xs text-graphite-500">Edit section heading, body text, and video asset link.</p>
+        </div>
+
+        <div className="space-y-4">
+          <Input label="Section Heading" value={videoHeading} onChange={(e) => setVideoHeading(e.target.value)} />
+          <div>
+            <label className="block text-xs font-bold text-graphite-800 mb-1">Body Description</label>
+            <textarea
+              rows={3}
+              value={videoBody}
+              onChange={(e) => setVideoBody(e.target.value)}
+              className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs text-graphite-900"
+            />
+          </div>
+          <Input label="Video URL (MP4 / WebM)" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} />
+        </div>
+
+        <div className="pt-4 border-t border-graphite-100 flex justify-end">
+          <Button size="sm" isLoading={loading} onClick={handleSaveVideoSection}>
+            <Save className="h-4 w-4 mr-1.5" /> Save Changes
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// 2. ABOUT PAGE CONTENT EDITOR
+// ----------------------------------------------------
+const AboutPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) => {
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchPage() {
+      setLoading(true);
+      try {
+        const res = await apiClient.get('/cms/pages/about');
+        setPageData(res.data.data || res.data);
+      } catch (err) {
+        console.error('Failed to load About page', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPage();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put('/cms/pages/about', {
+        title: pageData?.title || 'About Us',
+        content: pageData?.content || {},
+        isPublished: true,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="py-8 text-center text-xs text-graphite-400">Loading About Page Content...</div>;
+
+  const content = pageData?.content || {};
+
+  return (
+    <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-graphite-100 pb-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900">About Page Visual Editor</h3>
+          <p className="text-xs text-graphite-500">Edit headings, body copy, and section images for the About Us page.</p>
+        </div>
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+
+      {/* Hero Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">HERO SECTION</h4>
+        <Input
+          label="Heading"
+          value={content.hero?.title || 'Real Diamonds. Without the Weight.'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Body Text</label>
+          <textarea
+            rows={3}
+            value={content.hero?.body || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, body: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+        <ImageUploader
+          label="Hero Cover Image"
+          aspectRatioGuidance="Recommended: Desktop 16:9"
+          value={content.hero?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
+        />
+      </div>
+
+      {/* Maths Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">BECAUSE THE MATHS STOPPED MAKING SENSE</h4>
+        <Input
+          label="Heading"
+          value={content.maths?.title || 'Because the Maths Stopped Making Sense'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, maths: { ...content.maths, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Body Text</label>
+          <textarea
+            rows={5}
+            value={content.maths?.body || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, maths: { ...content.maths, body: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+        <ImageUploader
+          label="Section Image"
+          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          value={content.maths?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, maths: { ...content.maths, image: url } } })}
+        />
+      </div>
+
+      {/* Worn Not Stored Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">WORN, NOT STORED</h4>
+        <Input
+          label="Heading"
+          value={content.worn?.title || 'Worn, Not Stored'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, worn: { ...content.worn, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Body Text</label>
+          <textarea
+            rows={4}
+            value={content.worn?.body || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, worn: { ...content.worn, body: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+        <ImageUploader
+          label="Section Image"
+          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          value={content.worn?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, worn: { ...content.worn, image: url } } })}
+        />
+      </div>
+
+      {/* Founders Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">FOUNDERS SECTION</h4>
+        <Input
+          label="Founders Heading"
+          value={content.founder?.title || 'Built in Bangalore, by Two People Who Saw the Same Gap'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, founder: { ...content.founder, title: e.target.value } } })}
+        />
+        <ImageUploader
+          label="Founders Image"
+          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          value={content.founder?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, founder: { ...content.founder, image: url } } })}
+        />
+      </div>
+
+      {/* Experience Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">THE HOUSE OF SEYA EXPERIENCE</h4>
+        <Input
+          label="Heading"
+          value={content.experience?.title || 'The House of Seya Experience'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, experience: { ...content.experience, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Body Text</label>
+          <textarea
+            rows={4}
+            value={content.experience?.body || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, experience: { ...content.experience, body: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+        <ImageUploader
+          label="Section Image"
+          aspectRatioGuidance="Recommended: 4:5 Portrait"
+          value={content.experience?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, experience: { ...content.experience, image: url } } })}
+        />
+      </div>
+
+      <div className="pt-4 border-t border-graphite-100 flex justify-end">
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// 3. GIFTING PAGE CONTENT EDITOR
+// ----------------------------------------------------
+const GiftingPageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) => {
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchPage() {
+      setLoading(true);
+      try {
+        const res = await apiClient.get('/cms/pages/gifting');
+        setPageData(res.data.data || res.data);
+      } catch (err) {
+        console.error('Failed to load Gifting page', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPage();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put('/cms/pages/gifting', {
+        title: pageData?.title || 'Gifting',
+        content: pageData?.content || {},
+        isPublished: true,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="py-8 text-center text-xs text-graphite-400">Loading Gifting Page...</div>;
+
+  const content = pageData?.content || {};
+
+  return (
+    <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-graphite-100 pb-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900">Gifting Page Visual Editor</h3>
+          <p className="text-xs text-graphite-500">Edit titles, descriptions, and curation images for Gifting.</p>
+        </div>
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+
+      {/* Hero Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">HERO SECTION</h4>
+        <Input
+          label="Tagline"
+          value={content.hero?.tagline || 'FOR SOMEONE SPECIAL'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, tagline: e.target.value } } })}
+        />
+        <Input
+          label="Heading"
+          value={content.hero?.title || 'Gifts That Stay Constant'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, title: e.target.value } } })}
+        />
+        <ImageUploader
+          label="Hero Image"
+          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          value={content.hero?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
+        />
+      </div>
+
+      {/* Ready to Ship */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">READY TO SHIP SECTION</h4>
+        <Input
+          label="Heading"
+          value={content.readyToShip?.title || 'Need a Gift Urgently?'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, readyToShip: { ...content.readyToShip, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Body Description</label>
+          <textarea
+            rows={3}
+            value={content.readyToShip?.body || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, readyToShip: { ...content.readyToShip, body: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+      </div>
+
+      <div className="pt-4 border-t border-graphite-100 flex justify-end">
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// 4. CUSTOMISE PAGE CONTENT EDITOR
+// ----------------------------------------------------
+const CustomisePageContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) => {
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchPage() {
+      setLoading(true);
+      try {
+        const res = await apiClient.get('/cms/pages/customise');
+        setPageData(res.data.data || res.data);
+      } catch (err) {
+        console.error('Failed to load Customise page', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPage();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put('/cms/pages/customise', {
+        title: pageData?.title || 'Customise',
+        content: pageData?.content || {},
+        isPublished: true,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="py-8 text-center text-xs text-graphite-400">Loading Customise Page...</div>;
+
+  const content = pageData?.content || {};
+  const steps = content.steps || [
+    { step: 1, title: 'Choose Your Piece', description: 'Select your preferred jewelry piece.' },
+    { step: 2, title: 'Choose Your Diamond', description: 'Select diamond carat and shape.' },
+    { step: 3, title: 'Select Setting', description: 'Choose setting style.' },
+    { step: 4, title: 'Personalisation', description: 'Add engraving or custom touches.' },
+    { step: 5, title: 'Final Review', description: 'Review your bespoke creation.' },
+  ];
+
+  return (
+    <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-graphite-100 pb-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900">Customise Page Visual Editor</h3>
+          <p className="text-xs text-graphite-500">Edit titles, descriptions, and wizard steps for Customise.</p>
+        </div>
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        {steps.map((s: any, i: number) => (
+          <div key={i} className="space-y-3 bg-graphite-50 p-4 rounded-xl border border-graphite-200">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">STEP {i + 1}: {s.title}</h4>
+            <Input
+              label="Step Heading"
+              value={s.title}
+              onChange={(e) => {
+                const updated = [...steps];
+                updated[i].title = e.target.value;
+                setPageData({ ...pageData, content: { ...content, steps: updated } });
+              }}
+            />
+            <Input
+              label="Step Description"
+              value={s.description}
+              onChange={(e) => {
+                const updated = [...steps];
+                updated[i].description = e.target.value;
+                setPageData({ ...pageData, content: { ...content, steps: updated } });
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="pt-4 border-t border-graphite-100 flex justify-end">
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// 5. DIAMOND EDUCATION CONTENT EDITOR
+// ----------------------------------------------------
+const DiamondEducationContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) => {
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchPage() {
+      setLoading(true);
+      try {
+        const res = await apiClient.get('/cms/pages/diamond-education');
+        setPageData(res.data.data || res.data);
+      } catch (err) {
+        console.error('Failed to load Diamond Education page', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPage();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put('/cms/pages/diamond-education', {
+        title: pageData?.title || 'Diamond Education',
+        content: pageData?.content || {},
+        isPublished: true,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="py-8 text-center text-xs text-graphite-400">Loading Diamond Education...</div>;
+
+  const content = pageData?.content || {};
+
+  return (
+    <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-graphite-100 pb-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900">Diamond Education Visual Editor</h3>
+          <p className="text-xs text-graphite-500">Edit guide headings, 4Cs descriptions, and educational images.</p>
+        </div>
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+
+      {/* Hero Section */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">HERO SECTION</h4>
+        <Input
+          label="Guide Title"
+          value={content.hero?.title || 'The Complete Diamond Guide'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, title: e.target.value } } })}
+        />
+        <ImageUploader
+          label="Hero Banner Image"
+          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          value={content.hero?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
+        />
+      </div>
+
+      {/* What are Lab-Grown Diamonds */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">WHAT ARE LAB-GROWN DIAMONDS</h4>
+        <Input
+          label="Heading"
+          value={content.whatAreLabGrown?.title || 'What Are Lab-Grown Diamonds?'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, whatAreLabGrown: { ...content.whatAreLabGrown, title: e.target.value } } })}
+        />
+        <div>
+          <label className="block text-xs font-bold text-graphite-800 mb-1">Paragraph 1</label>
+          <textarea
+            rows={3}
+            value={content.whatAreLabGrown?.p1 || ''}
+            onChange={(e) => setPageData({ ...pageData, content: { ...content, whatAreLabGrown: { ...content.whatAreLabGrown, p1: e.target.value } } })}
+            className="w-full rounded-lg border border-graphite-300 p-2.5 text-xs"
+          />
+        </div>
+        <ImageUploader
+          label="Section Image"
+          aspectRatioGuidance="Recommended: 4:3"
+          value={content.whatAreLabGrown?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, whatAreLabGrown: { ...content.whatAreLabGrown, image: url } } })}
+        />
+      </div>
+
+      <div className="pt-4 border-t border-graphite-100 flex justify-end">
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// 6. GOLD VERMEIL CONTENT EDITOR
+// ----------------------------------------------------
+const GoldVermeilContentEditor: React.FC<{ onSaved: () => void }> = ({ onSaved }) => {
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchPage() {
+      setLoading(true);
+      try {
+        const res = await apiClient.get('/cms/pages/gold-vermeil');
+        setPageData(res.data.data || res.data);
+      } catch (err) {
+        console.error('Failed to load Gold Vermeil page', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPage();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.put('/cms/pages/gold-vermeil', {
+        title: pageData?.title || 'Gold Vermeil',
+        content: pageData?.content || {},
+        isPublished: true,
+      });
+      onSaved();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="py-8 text-center text-xs text-graphite-400">Loading Gold Vermeil...</div>;
+
+  const content = pageData?.content || {};
+
+  return (
+    <div className="rounded-xl border border-graphite-200 bg-white p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-graphite-100 pb-4">
+        <div>
+          <h3 className="text-sm font-bold text-graphite-900">Gold Vermeil Guide Editor</h3>
+          <p className="text-xs text-graphite-500">Edit titles, text paragraphs, and images for the Gold Vermeil page.</p>
+        </div>
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+
+      {/* Hero */}
+      <div className="space-y-4 bg-graphite-50 p-5 rounded-xl border border-graphite-200">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-brand-700">HERO SECTION</h4>
+        <Input
+          label="Title"
+          value={content.hero?.title || 'The Complete Gold Vermeil Guide'}
+          onChange={(e) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, title: e.target.value } } })}
+        />
+        <ImageUploader
+          label="Hero Image"
+          aspectRatioGuidance="Recommended: 16:9 Landscape"
+          value={content.hero?.image || ''}
+          onChange={(url) => setPageData({ ...pageData, content: { ...content, hero: { ...content.hero, image: url } } })}
+        />
+      </div>
+
+      <div className="pt-4 border-t border-graphite-100 flex justify-end">
+        <Button size="sm" isLoading={saving} onClick={handleSave}>
+          <Save className="h-4 w-4 mr-1.5" /> Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// MODAL COMPONENTS WITH IMAGE UPLOADER
 // ----------------------------------------------------
 
 const HeroSlideModal: React.FC<{ slide: HeroSlide | null; isOpen: boolean; onClose: () => void; onSaved: () => void }> = ({ slide, isOpen, onClose, onSaved }) => {
@@ -1009,23 +1472,30 @@ const HeroSlideModal: React.FC<{ slide: HeroSlide | null; isOpen: boolean; onClo
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={slide ? 'Edit Hero Slide' : 'Add Hero Slide'}>
+    <Modal isOpen={isOpen} onClose={onClose} title={slide ? 'Edit Hero Banner' : 'Add Hero Banner'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
         <Input label="Tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} />
-        <Input label="Image URL" value={image} onChange={(e) => setImage(e.target.value)} required />
+
+        <ImageUploader
+          label="Hero Banner Image"
+          aspectRatioGuidance="Recommended: Desktop 16:9 (1920 × 1080 px)"
+          value={image}
+          onChange={(url) => setImage(url)}
+        />
+
         <div className="grid grid-cols-2 gap-3">
-          <Input label="CTA Button Text" value={cta} onChange={(e) => setCta(e.target.value)} />
-          <Input label="Target Link (href)" value={href} onChange={(e) => setHref(e.target.value)} required />
+          <Input label="Button Text" value={cta} onChange={(e) => setCta(e.target.value)} />
+          <Input label="Button Link" value={href} onChange={(e) => setHref(e.target.value)} required />
         </div>
         <Input label="Sort Order" type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} />
         <label className="flex items-center gap-2 text-xs font-semibold text-graphite-700 cursor-pointer">
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4" />
-          <span>Active Slide</span>
+          <span>Active Banner</span>
         </label>
         <div className="flex justify-end gap-2 pt-3 border-t">
           <Button type="button" variant="outline" size="sm" onClick={onClose}>Cancel</Button>
-          <Button type="submit" size="sm" isLoading={loading}>Save Slide</Button>
+          <Button type="submit" size="sm" isLoading={loading}>Save Banner</Button>
         </div>
       </form>
     </Modal>
@@ -1126,11 +1596,18 @@ const BlogModal: React.FC<{ post: BlogPost | null; isOpen: boolean; onClose: () 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={post ? 'Edit Blog Article' : 'Add Blog Article'} maxWidth="xl">
+    <Modal isOpen={isOpen} onClose={onClose} title={post ? 'Edit Journal Article' : 'Add Journal Article'} maxWidth="xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
         <Input label="URL Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
-        <Input label="Cover Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+
+        <ImageUploader
+          label="Article Cover Image"
+          aspectRatioGuidance="Recommended: 16:9 (1200 × 675 px)"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url)}
+        />
+
         <Input label="Excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
         <div>
           <label className="block text-xs font-semibold text-graphite-700 mb-1">Article Content Body</label>
@@ -1159,7 +1636,6 @@ const FaqModal: React.FC<{ faq: FAQ | null; categories: ProductCategory[]; isOpe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Ensure valid FAQCategory ID exists
     const categoriesRes = await apiClient.get('/cms/faq-categories');
     const existingCats = categoriesRes.data.data?.categories || categoriesRes.data?.categories || [];
     let catId = existingCats[0]?.id;
@@ -1251,7 +1727,14 @@ const CategoryModal: React.FC<{ category: ProductCategory | null; isOpen: boolea
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input label="Category Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Input label="URL Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
-        <Input label="Category Image URL" value={image} onChange={(e) => setImage(e.target.value)} />
+
+        <ImageUploader
+          label="Category Cover Image"
+          aspectRatioGuidance="Recommended: 1:1 Square or 4:3"
+          value={image}
+          onChange={(url) => setImage(url)}
+        />
+
         <Input label="Sort Order" type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} />
         <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
           <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="h-4 w-4" />
@@ -1314,121 +1797,6 @@ const SubcategoryModal: React.FC<{ subcategory: Subcategory | null; categories: 
         <div className="flex justify-end gap-2 pt-3 border-t">
           <Button type="button" variant="outline" size="sm" onClick={onClose}>Cancel</Button>
           <Button type="submit" size="sm" isLoading={loading}>Save Subcategory</Button>
-        </div>
-      </form>
-    </Modal>
-  );
-};
-
-const NavModal: React.FC<{ item: NavigationItem | null; parentItems: NavigationItem[]; isOpen: boolean; onClose: () => void; onSaved: () => void }> = ({ item, parentItems, isOpen, onClose, onSaved }) => {
-  const [label, setLabel] = useState(item?.label || '');
-  const [href, setHref] = useState(item?.href || '');
-  const [parentId, setParentId] = useState(item?.parentId || '');
-  const [sortOrder, setSortOrder] = useState(item?.sortOrder || 0);
-  const [isActive, setIsActive] = useState(item?.isActive ?? true);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const payload = { label, href, parentId: parentId || null, sortOrder: Number(sortOrder), isActive };
-    try {
-      if (item) {
-        await apiClient.put(`/cms/navigation/${item.id}`, payload);
-      } else {
-        await apiClient.post('/cms/navigation', payload);
-      }
-      onSaved();
-      onClose();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={item ? 'Edit Navigation Item' : 'Add Navigation Item'}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input label="Label" value={label} onChange={(e) => setLabel(e.target.value)} required />
-        <Input label="Href / Link Target" value={href} onChange={(e) => setHref(e.target.value)} required />
-        <Select
-          label="Parent Navigation Item (Optional)"
-          value={parentId}
-          onChange={(e) => setParentId(e.target.value)}
-          options={[
-            { value: '', label: 'None (Top Level Root)' },
-            ...parentItems.filter((p) => p.id !== item?.id).map((p) => ({ value: p.id, label: p.label })),
-          ]}
-        />
-        <Input label="Sort Order" type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} />
-        <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4" />
-          <span>Active</span>
-        </label>
-        <div className="flex justify-end gap-2 pt-3 border-t">
-          <Button type="button" variant="outline" size="sm" onClick={onClose}>Cancel</Button>
-          <Button type="submit" size="sm" isLoading={loading}>Save Item</Button>
-        </div>
-      </form>
-    </Modal>
-  );
-};
-
-const PageModal: React.FC<{ page: any | null; isOpen: boolean; onClose: () => void; onSaved: () => void }> = ({ page, isOpen, onClose, onSaved }) => {
-  const [title, setTitle] = useState(page?.title || '');
-  const [contentJson, setContentJson] = useState(JSON.stringify(page?.content || {}, null, 2));
-  const [isPublished, setIsPublished] = useState(page?.isPublished ?? true);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null);
-    let parsedContent = {};
-    try {
-      parsedContent = JSON.parse(contentJson);
-    } catch (ex) {
-      setErr('Invalid JSON syntax in Page Content.');
-      return;
-    }
-    setLoading(true);
-    try {
-      await apiClient.put(`/cms/pages/${page.slug}`, {
-        title,
-        content: parsedContent,
-        isPublished,
-      });
-      onSaved();
-      onClose();
-    } catch (error: any) {
-      setErr(error.response?.data?.message || 'Failed to save page content.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Edit Page: ${page?.title}`} maxWidth="xl">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {err && <div className="rounded bg-red-50 p-2.5 text-xs text-red-700">{err}</div>}
-        <Input label="Page Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <div>
-          <label className="block text-xs font-semibold text-graphite-700 mb-1">Structured Content (JSON Format)</label>
-          <textarea
-            rows={10}
-            value={contentJson}
-            onChange={(e) => setContentJson(e.target.value)}
-            className="w-full rounded-lg border p-2.5 text-xs font-mono text-graphite-900 bg-graphite-50"
-          />
-        </div>
-        <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-          <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="h-4 w-4" />
-          <span>Published on Storefront</span>
-        </label>
-        <div className="flex justify-end gap-2 pt-3 border-t">
-          <Button type="button" variant="outline" size="sm" onClick={onClose}>Cancel</Button>
-          <Button type="submit" size="sm" isLoading={loading}>Save Page Content</Button>
         </div>
       </form>
     </Modal>

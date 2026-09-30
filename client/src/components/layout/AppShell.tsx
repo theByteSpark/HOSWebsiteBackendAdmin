@@ -3,64 +3,64 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { cn } from '@/lib/cn';
 import {
-  LayoutDashboard,
-  ShoppingBag,
-  Users,
   Gem,
-  Boxes,
-  BarChart3,
   Globe,
   Settings,
   LogOut,
   ChevronDown,
-  MoreHorizontal,
-  Bell,
   Sparkles,
+  Layout,
+  Home,
+  Info,
+  Gift,
+  Sliders,
+  BookOpen,
+  FileText,
+  FolderTree,
+  HelpCircle,
+  Star,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface NavItem {
   label: string;
   to: string;
   icon: React.ElementType;
-  end?: boolean;
 }
 
 interface NavGroup {
   key: string;
-  label?: string;
+  label: string;
   items: NavItem[];
 }
 
 export const AppShell: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   const navGroups: NavGroup[] = [
     {
-      key: 'core',
+      key: 'pages',
+      label: 'PAGE CONTENT EDITORS',
       items: [
-        { label: 'Dashboard', to: '/', icon: LayoutDashboard, end: true },
+        { label: 'Home Page', to: '/website?tab=home', icon: Home },
+        { label: 'About Page', to: '/website?tab=about', icon: Info },
+        { label: 'Gifting Page', to: '/website?tab=gifting', icon: Gift },
+        { label: 'Customise Page', to: '/website?tab=customise', icon: Sliders },
+        { label: 'Diamond Education', to: '/website?tab=diamond-education', icon: BookOpen },
+        { label: 'Gold Vermeil', to: '/website?tab=gold-vermeil', icon: Sparkles },
+        { label: 'Blogs', to: '/website?tab=blogs', icon: FileText },
       ],
     },
     {
-      key: 'operations',
-      label: 'Operations',
+      key: 'commerce',
+      label: 'COMMERCE CONTENT',
       items: [
-        { label: 'Orders', to: '/orders', icon: ShoppingBag },
-        { label: 'Customers', to: '/customers', icon: Users },
         { label: 'Products', to: '/products', icon: Gem },
-        { label: 'Inventory', to: '/inventory', icon: Boxes },
-        { label: 'Reports', to: '/reports', icon: BarChart3 },
-      ],
-    },
-    {
-      key: 'management',
-      label: 'Platform',
-      items: [
-        { label: 'Website & CMS', to: '/website', icon: Globe },
-        { label: 'Settings', to: '/settings', icon: Settings },
+        { label: 'Collections', to: '/website?tab=collections', icon: FolderTree },
+        { label: 'FAQs', to: '/website?tab=faqs', icon: HelpCircle },
+        { label: 'Reviews', to: '/website?tab=reviews', icon: Star },
       ],
     },
   ];
@@ -69,10 +69,12 @@ export const AppShell: React.FC = () => {
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const allItems = navGroups.flatMap((g) => g.items);
-  const mobilePrimaryPaths = ['/', '/orders', '/products', '/inventory'];
-  const mobilePrimaryItems = allItems.filter((item) => mobilePrimaryPaths.includes(item.to));
-  const mobileMoreItems = allItems.filter((item) => !mobilePrimaryPaths.includes(item.to));
+  const mobilePrimaryItems = [
+    { label: 'Home', to: '/website?tab=home', icon: Home },
+    { label: 'About', to: '/website?tab=about', icon: Info },
+    { label: 'Products', to: '/products', icon: Gem },
+    { label: 'Blogs', to: '/website?tab=blogs', icon: FileText },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8f9] lg:flex-row">
@@ -88,7 +90,7 @@ export const AppShell: React.FC = () => {
               <p className="text-sm font-bold tracking-tight text-graphite-900 truncate">House of Seya</p>
               <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </div>
-            <p className="text-[11px] font-medium text-graphite-400 truncate">Business Platform</p>
+            <p className="text-[11px] font-medium text-graphite-400 truncate">Visual Content Manager</p>
           </div>
         </div>
 
@@ -102,7 +104,7 @@ export const AppShell: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.key)}
-                    className="flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-graphite-400 hover:text-graphite-700 transition-colors"
+                    className="flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-graphite-400 hover:text-graphite-700 transition-colors"
                   >
                     <span>{group.label}</span>
                     <ChevronDown
@@ -114,15 +116,19 @@ export const AppShell: React.FC = () => {
                   <div className="space-y-0.5">
                     {group.items.map((item) => {
                       const Icon = item.icon;
+                      const currentUrl = location.pathname + location.search;
+                      const isItemActive = item.to.includes('?tab=')
+                        ? currentUrl === item.to
+                        : location.pathname === item.to;
+
                       return (
                         <NavLink
                           key={item.to}
                           to={item.to}
-                          end={item.end}
-                          className={({ isActive }) =>
+                          className={() =>
                             cn(
                               'flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold tracking-wide transition-all',
-                              isActive
+                              isItemActive
                                 ? 'bg-brand-50 text-brand-800 font-bold shadow-2xs border border-brand-200/60'
                                 : 'text-graphite-600 hover:bg-graphite-100/70 hover:text-graphite-900'
                             )
@@ -131,9 +137,7 @@ export const AppShell: React.FC = () => {
                           <Icon
                             className={cn(
                               'h-4 w-4 shrink-0 transition-colors',
-                              location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
-                                ? 'text-brand-700'
-                                : 'text-graphite-400 group-hover:text-graphite-600'
+                              isItemActive ? 'text-brand-700' : 'text-graphite-400 group-hover:text-graphite-600'
                             )}
                           />
                           <span>{item.label}</span>
@@ -180,7 +184,7 @@ export const AppShell: React.FC = () => {
           </div>
           <div>
             <p className="text-xs font-bold text-graphite-900 leading-tight">House of Seya</p>
-            <p className="text-[10px] font-medium text-graphite-400 leading-tight">Admin Platform</p>
+            <p className="text-[10px] font-medium text-graphite-400 leading-tight">Content Editor</p>
           </div>
         </div>
 
@@ -201,44 +205,6 @@ export const AppShell: React.FC = () => {
         </div>
       </main>
 
-      {/* Mobile More Sheet */}
-      {mobileMoreOpen && (
-        <div
-          className="fixed inset-0 z-40 flex items-end bg-graphite-900/40 backdrop-blur-xs lg:hidden"
-          onClick={() => setMobileMoreOpen(false)}
-        >
-          <div
-            className="w-full rounded-t-2xl bg-white p-4 pb-8 shadow-2xl animate-in slide-in-from-bottom"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-graphite-200" />
-            <p className="mb-3 px-2 text-xs font-bold uppercase tracking-wider text-graphite-400">All Modules</p>
-            <div className="grid grid-cols-3 gap-2">
-              {mobileMoreItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.end}
-                    onClick={() => setMobileMoreOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex flex-col items-center justify-center gap-1.5 rounded-xl p-3 text-xs font-semibold transition-colors',
-                        isActive ? 'bg-brand-50 text-brand-800' : 'text-graphite-600 hover:bg-graphite-50'
-                      )
-                    }
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="truncate text-center">{item.label}</span>
-                  </NavLink>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Mobile Bottom Navigation Bar */}
       <nav className="sticky bottom-0 z-30 flex items-stretch justify-around border-t border-graphite-200 bg-white py-1 lg:hidden shadow-lg">
         {mobilePrimaryItems.map((item) => {
@@ -247,7 +213,6 @@ export const AppShell: React.FC = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.end}
               className={({ isActive }) =>
                 cn(
                   'flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-1.5 text-[10px] font-semibold transition-colors',
@@ -260,14 +225,6 @@ export const AppShell: React.FC = () => {
             </NavLink>
           );
         })}
-        <button
-          type="button"
-          onClick={() => setMobileMoreOpen(true)}
-          className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-1.5 text-[10px] font-semibold text-graphite-500"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-          <span className="truncate">More</span>
-        </button>
       </nav>
     </div>
   );

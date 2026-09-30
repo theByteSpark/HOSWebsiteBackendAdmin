@@ -87,11 +87,20 @@ export const ProductsPage: React.FC = () => {
   const columns: Column<Product>[] = [
     {
       header: 'Jewelry Piece',
-      accessor: (row) => (
+      accessor: (row) => {
+        // Find primary image: Yellow Gold primary → any Yellow Gold → any variant primary → first image
+        const ygVariant = row.variants?.find(v => v.metalFinish === 'Yellow Gold');
+        const primaryImg =
+          ygVariant?.images?.find(i => i.isPrimary)?.url ||
+          ygVariant?.images?.[0]?.url ||
+          row.variants?.flatMap(v => v.images || []).find(i => i.isPrimary)?.url ||
+          row.variants?.flatMap(v => v.images || [])[0]?.url ||
+          row.images?.[0]?.url || null;
+        return (
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-graphite-100 overflow-hidden border border-graphite-200">
-            {row.images?.[0]?.url ? (
-              <img src={row.images[0].url} alt={row.name} className="h-full w-full object-cover" />
+            {primaryImg ? (
+              <img src={primaryImg} alt={row.name} className="h-full w-full object-cover" />
             ) : (
               <Gem className="h-4 w-4 text-graphite-400" />
             )}
@@ -101,7 +110,8 @@ export const ProductsPage: React.FC = () => {
             <p className="text-xs text-graphite-400">SKU: {row.sku || '—'}</p>
           </div>
         </div>
-      ),
+        );
+      },
     },
     {
       header: 'Category',
