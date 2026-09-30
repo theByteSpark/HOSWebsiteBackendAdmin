@@ -29,7 +29,7 @@ apiClient.interceptors.response.use(
       const refreshToken = tokenStore.getRefreshToken();
       if (refreshToken) {
         try {
-          const res = await axios.post('/api/v1/auth/refresh', { refreshToken });
+          const res = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, { refreshToken });
           const newAccessToken = res.data.accessToken || res.data.data?.accessToken;
           if (newAccessToken) {
             tokenStore.setAccessToken(newAccessToken);
