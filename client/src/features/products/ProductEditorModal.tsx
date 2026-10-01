@@ -78,7 +78,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   // ── Product fields ─────────────────────────────────────────────────────
   const [name, setName]                       = useState('');
   const [sku, setSku]                         = useState('');
-  const [categoryId, setCategoryId]           = useState('');
   const [subcategoryId, setSubcategoryId]     = useState('');
   const [price, setPrice]                     = useState('');
   const [description, setDescription]         = useState('');
@@ -107,7 +106,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     if (product) {
       setName(product.name || '');
       setSku(product.sku || '');
-      setCategoryId(product.categoryId || (categories[0]?.id ?? ''));
       setSubcategoryId(product.subcategoryId || '');
       setPrice(String(product.price || ''));
       setDescription(product.description || '');
@@ -136,7 +134,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
       );
     } else {
       setName(''); setSku('');
-      setCategoryId(categories[0]?.id || ''); setSubcategoryId('');
+      setSubcategoryId('');
       setPrice(''); setDescription('');
       setNetWeightGrams(''); setTotalDiamondCt(''); setSmallDiamondCt(''); setTotalDiamondPcs('');
       setDiamondGrade('EF VVS-VS'); setIsPublished(true); setInStock(true);
@@ -147,8 +145,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     setSaveStep(null);
   }, [product, categories, isOpen]);
 
-  const activeCategory = categories.find(c => c.id === categoryId);
-  const subcategories: Subcategory[] = activeCategory?.subcategories || [];
+  // Subcategory is the only classification asked for; the backend sets the category from it.
+  const subcategoryOptions = categories.flatMap(c =>
+    (c.subcategories || []).map((s: Subcategory) => ({ value: s.id, label: `${s.name} (${c.name})` })),
+  );
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -167,7 +167,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     const missing: string[] = [];
     if (!name.trim()) missing.push('Product Title');
     if (!sku.trim()) missing.push('SKU Code');
-    if (!categoryId) missing.push('Category');
     if (!subcategoryId) missing.push('Subcategory');
     if (!price || Number(price) <= 0) missing.push('Price');
     if (netWeightGrams === '') missing.push('Net Weight');
@@ -201,8 +200,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         await apiClient.patch(`/products/${product!.id}`, {
           name,
           sku: sku.trim(),
-          categoryId,
-          subcategoryId: subcategoryId || null,
+          subcategoryId,
           price: Number(price),
           description: description.trim(),
           netWeightGrams: Number(netWeightGrams),
@@ -246,8 +244,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         const prodRes = await apiClient.post('/products', {
           name,
           sku: sku.trim(),
-          categoryId,
-          subcategoryId: subcategoryId || null,
+          subcategoryId,
           price: Number(price),
           description: description.trim(),
           netWeightGrams: Number(netWeightGrams),
@@ -317,7 +314,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Input
               label="SKU Code *"
               placeholder="HOS-RNG-001"
@@ -326,20 +323,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               required
             />
             <Select
-              label="Category *"
-              value={categoryId}
-              onChange={e => { setCategoryId(e.target.value); setSubcategoryId(''); }}
-              required
-              options={categories.map(c => ({ value: c.id, label: c.name }))}
-            />
-            <Select
               label="Subcategory *"
               value={subcategoryId}
               onChange={e => setSubcategoryId(e.target.value)}
               required
               options={[
                 { value: '', label: 'Select subcategory' },
-                ...subcategories.map(s => ({ value: s.id, label: s.name })),
+                ...subcategoryOptions,
               ]}
             />
           </div>

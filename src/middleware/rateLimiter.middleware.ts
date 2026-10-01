@@ -14,6 +14,8 @@ export const authRateLimiter = rateLimit({
 export const apiRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500, // 500 requests per 15 min window
+  // Bulk image uploads send hundreds of requests; they are admin-authenticated.
+  skip: (req) => req.originalUrl.includes('/media/upload'),
   message: {
     success: false,
     message: 'Too many requests. Please slow down.',

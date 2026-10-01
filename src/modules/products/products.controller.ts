@@ -115,7 +115,7 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       name,
       slug,
       sku,
-      categoryId,
+      categoryId: bodyCategoryId,
       subcategoryId,
       price,
       originalPrice,
@@ -135,8 +135,18 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       initialStock = 0,
     } = req.body;
 
+    // The category is derived from the subcategory when it isn't sent.
+    let categoryId: string | undefined = bodyCategoryId || undefined;
+    if (!categoryId && subcategoryId) {
+      const sub = await prisma.subcategory.findUnique({ where: { id: subcategoryId }, select: { categoryId: true } });
+      if (!sub) {
+        return sendError(res, 'Selected subcategory does not exist.', 400);
+      }
+      categoryId = sub.categoryId;
+    }
+
     if (!name || !categoryId || price === undefined) {
-      return sendError(res, 'Name, categoryId, and price are required', 400);
+      return sendError(res, 'Name, subcategory, and price are required', 400);
     }
 
     // Validate Category exists
@@ -242,7 +252,7 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
       name,
       slug,
       sku,
-      categoryId,
+      categoryId: bodyCategoryId,
       subcategoryId,
       price,
       originalPrice,
@@ -264,6 +274,16 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
     const existing = await prisma.product.findUnique({ where: { id } });
     if (!existing || existing.deletedAt) {
       return sendError(res, 'Product not found', 404);
+    }
+
+    // The category is derived from the subcategory when it isn't sent.
+    let categoryId: string | undefined = bodyCategoryId || undefined;
+    if (!categoryId && subcategoryId) {
+      const sub = await prisma.subcategory.findUnique({ where: { id: subcategoryId }, select: { categoryId: true } });
+      if (!sub) {
+        return sendError(res, 'Selected subcategory does not exist.', 400);
+      }
+      categoryId = sub.categoryId;
     }
 
     const targetCategoryId = categoryId || existing.categoryId;

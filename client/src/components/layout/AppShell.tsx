@@ -51,6 +51,7 @@ export const AppShell: React.FC = () => {
         { label: 'Products', to: '/products', icon: Gem },
         { label: 'Categories', to: '/categories', icon: FolderTree },
         { label: 'Subcategories', to: '/subcategories', icon: Layers },
+        { label: 'Product Images', to: '/images', icon: ImageIcon },
       ],
     },
     {

@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProductsPage } from '@/features/products/ProductsPage';
 import { CategoriesPage } from '@/features/categories/CategoriesPage';
+import { ImagesPage } from '@/features/media/ImagesPage';
 import { SubcategoriesPage } from '@/features/categories/SubcategoriesPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 
@@ -25,6 +26,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/subcategories" element={<SubcategoriesPage />} />
+        <Route path="/images" element={<ImagesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/admin-users" element={<Navigate to="/settings?tab=users" replace />} />
       </Route>

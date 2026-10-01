@@ -99,6 +99,19 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
       return sendError(res, 'No file uploaded', 400);
     }
 
+    // Bulk image uploads (Excel references images by file name) must have unique names.
+    if (req.body.requireUniqueName === 'true') {
+      const wanted = req.file.originalname.trim();
+      const existing = await prisma.mediaAsset.findFirst({
+        where: { originalName: { equals: wanted, mode: 'insensitive' } },
+        select: { id: true },
+      });
+      if (existing) {
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return sendError(res, `A file named "${wanted}" already exists. File names must be unique.`, 409);
+      }
+    }
+
     // ── Backend image-dimension validation ───────────────────────────────────
     // Read the actual file from disk and inspect its dimensions with sharp.
     // This is defence-in-depth: the frontend should have cropped already, but
@@ -185,12 +198,31 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
 
 // ─── List media assets ───────────────────────────────────────────────────────
 
+// URLs of every image currently referenced by a product or category.
+async function getUsedMediaUrls(): Promise<Set<string>> {
+  const [productImages, variantImages, categories] = await Promise.all([
+    prisma.productImage.findMany({ select: { url: true } }),
+    prisma.variantImage.findMany({ select: { url: true } }),
+    prisma.productCategory.findMany({ select: { image: true, bannerImage: true } }),
+  ]);
+  const used = new Set<string>();
+  productImages.forEach((i) => used.add(i.url));
+  variantImages.forEach((i) => used.add(i.url));
+  categories.forEach((c) => {
+    if (c.image) used.add(c.image);
+    if (c.bannerImage) used.add(c.bannerImage);
+  });
+  return used;
+}
+
 export const getMediaAssets = async (req: Request, res: Response) => {
   try {
-    const { folder, search, page = '1', limit = '30' } = req.query;
+    const { folder, search, unused, page = '1', limit = '30' } = req.query;
     const pageNum = parseInt(page as string, 10);
-    const limitNum = parseInt(limit as string, 10);
+    const limitNum = Math.min(parseInt(limit as string, 10) || 30, 100);
     const skip = (pageNum - 1) * limitNum;
+
+    const used = await getUsedMediaUrls();
 
     const where: any = {};
     if (folder) where.folder = folder as string;
@@ -200,6 +232,7 @@ export const getMediaAssets = async (req: Request, res: Response) => {
         { altText: { contains: search as string, mode: 'insensitive' } },
       ];
     }
+    if (unused === 'true') where.url = { notIn: Array.from(used) };
 
     const [assets, total] = await Promise.all([
       prisma.mediaAsset.findMany({
@@ -212,7 +245,7 @@ export const getMediaAssets = async (req: Request, res: Response) => {
     ]);
 
     return sendSuccess(res, {
-      assets,
+      assets: assets.map((a) => ({ ...a, inUse: used.has(a.url) })),
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum),
@@ -230,6 +263,11 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
     const asset = await prisma.mediaAsset.findUnique({ where: { id } });
     if (!asset) {
       return sendError(res, 'Media asset not found', 404);
+    }
+
+    const used = await getUsedMediaUrls();
+    if (used.has(asset.url)) {
+      return sendError(res, 'This image is used by a product or category. Remove it there first.', 409);
     }
 
     if (fs.existsSync(asset.path)) {
