@@ -22,7 +22,6 @@ export const getDashboardAnalytics = async (req: AuthenticatedRequest, res: Resp
       orderCountToday,
       inventoryItems,
       ordersByStatus,
-      pendingReviewsCount,
     ] = await Promise.all([
       prisma.order.findMany({
         where: {
@@ -68,9 +67,6 @@ export const getDashboardAnalytics = async (req: AuthenticatedRequest, res: Resp
         _count: { id: true },
         where: { deletedAt: null },
       }),
-      prisma.review.count({
-        where: { isPublished: false },
-      }),
     ]);
 
     const revenue30d = orders30d.reduce((sum: number, o: any) => sum + Number(o.total), 0);
@@ -100,7 +96,6 @@ export const getDashboardAnalytics = async (req: AuthenticatedRequest, res: Resp
       orderCount30d: orders30d.length,
       pendingOrdersCount: statusCountsMap['PENDING'] || 0,
       lowStockCount,
-      pendingReviewsCount,
       ordersByStatus: statusCountsMap,
     });
   } catch (error) {

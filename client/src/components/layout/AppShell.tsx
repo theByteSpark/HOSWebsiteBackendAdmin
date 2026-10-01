@@ -17,6 +17,7 @@ import {
   BookOpen,
   FileText,
   FolderTree,
+  Layers,
   HelpCircle,
   Star,
   Image as ImageIcon,
@@ -44,26 +45,12 @@ export const AppShell: React.FC = () => {
 
   const navGroups: NavGroup[] = [
     {
-      key: 'pages',
-      label: 'PAGE CONTENT EDITORS',
-      items: [
-        { label: 'Home Page', to: '/website?tab=home', icon: Home },
-        { label: 'About Page', to: '/website?tab=about', icon: Info },
-        { label: 'Gifting Page', to: '/website?tab=gifting', icon: Gift },
-        { label: 'Customise Page', to: '/website?tab=customise', icon: Sliders },
-        { label: 'Diamond Education', to: '/website?tab=diamond-education', icon: BookOpen },
-        { label: 'Gold Vermeil', to: '/website?tab=gold-vermeil', icon: Sparkles },
-        { label: 'Blogs', to: '/website?tab=blogs', icon: FileText },
-      ],
-    },
-    {
       key: 'commerce',
       label: 'COMMERCE CONTENT',
       items: [
         { label: 'Products', to: '/products', icon: Gem },
-        { label: 'Collections', to: '/website?tab=collections', icon: FolderTree },
-        { label: 'FAQs', to: '/website?tab=faqs', icon: HelpCircle },
-        { label: 'Reviews', to: '/website?tab=reviews', icon: Star },
+        { label: 'Categories', to: '/categories', icon: FolderTree },
+        { label: 'Subcategories', to: '/subcategories', icon: Layers },
       ],
     },
     {
@@ -71,8 +58,6 @@ export const AppShell: React.FC = () => {
       label: 'ADMINISTRATION & AUDIT',
       items: [
         { label: 'Admin Users', to: '/settings?tab=users', icon: Users },
-        { label: 'Audit Logs', to: '/settings?tab=audit', icon: History },
-        { label: 'Site Settings', to: '/settings?tab=site', icon: Settings },
       ],
     },
   ];
@@ -82,10 +67,9 @@ export const AppShell: React.FC = () => {
   };
 
   const mobilePrimaryItems = [
-    { label: 'Home', to: '/website?tab=home', icon: Home },
+    { label: 'Categories', to: '/categories', icon: FolderTree },
     { label: 'Products', to: '/products', icon: Gem },
     { label: 'Users', to: '/settings?tab=users', icon: Users },
-    { label: 'Audit', to: '/settings?tab=audit', icon: History },
   ];
 
   return (

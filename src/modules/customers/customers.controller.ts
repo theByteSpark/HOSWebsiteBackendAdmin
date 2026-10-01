@@ -98,16 +98,6 @@ export const createCustomer = async (req: AuthenticatedRequest, res: Response) =
       include: { addresses: true },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'Customer',
-        entityId: customer.id,
-        after: customer as any,
-        note: `Created customer ${customer.name}`,
-      },
-    });
 
     return sendSuccess(res, customer, 'Customer created successfully', 201);
   } catch (error) {
@@ -139,17 +129,6 @@ export const updateCustomer = async (req: AuthenticatedRequest, res: Response) =
       include: { addresses: true },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'UPDATE',
-        adminUserId: req.user?.id,
-        entityType: 'Customer',
-        entityId: updated.id,
-        before: existing as any,
-        after: updated as any,
-        note: `Updated customer ${updated.name}`,
-      },
-    });
 
     return sendSuccess(res, updated, 'Customer updated successfully');
   } catch (error) {

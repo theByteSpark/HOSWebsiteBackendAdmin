@@ -3,7 +3,6 @@ import { prisma } from '../../config/db';
 import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { logAudit } from '../../utils/auditLogger';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -127,6 +126,7 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       isMadeToOrder,
       netWeightGrams,
       totalDiamondCt,
+      smallDiamondCt,
       totalDiamondPcs,
       diamondGrade,
       images,
@@ -198,11 +198,13 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
         originalPrice: parsedOriginalPrice,
         description: description || null,
         shortDescription: shortDescription || null,
-        isPublished: isPublished !== undefined ? isPublished : false,
+        // New products always go live; they can be unpublished later.
+        isPublished: true,
         inStock: inStock !== undefined ? inStock : true,
         isMadeToOrder: isMadeToOrder || false,
         netWeightGrams: netWeightGrams !== undefined && netWeightGrams !== null && netWeightGrams !== '' ? Number(netWeightGrams) : null,
         totalDiamondCt: totalDiamondCt !== undefined && totalDiamondCt !== null && totalDiamondCt !== '' ? Number(totalDiamondCt) : null,
+        smallDiamondCt: smallDiamondCt !== undefined && smallDiamondCt !== null && smallDiamondCt !== '' ? Number(smallDiamondCt) : null,
         totalDiamondPcs: totalDiamondPcs !== undefined && totalDiamondPcs !== null && totalDiamondPcs !== '' ? Number(totalDiamondPcs) : null,
         diamondGrade: diamondGrade || null,
         images: images ? { create: images } : undefined,
@@ -226,16 +228,6 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'Product',
-        entityId: product.id,
-        after: product as any,
-        note: `Created product ${product.name}`,
-      },
-    });
 
     return sendSuccess(res, product, 'Product created successfully', 201);
   } catch (error) {
@@ -261,6 +253,7 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
       isMadeToOrder,
       netWeightGrams,
       totalDiamondCt,
+      smallDiamondCt,
       totalDiamondPcs,
       diamondGrade,
       images,
@@ -371,6 +364,7 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
         ...(isMadeToOrder !== undefined && { isMadeToOrder }),
         ...(netWeightGrams !== undefined && { netWeightGrams: netWeightGrams !== null && netWeightGrams !== '' ? Number(netWeightGrams) : null }),
         ...(totalDiamondCt !== undefined && { totalDiamondCt: totalDiamondCt !== null && totalDiamondCt !== '' ? Number(totalDiamondCt) : null }),
+        ...(smallDiamondCt !== undefined && { smallDiamondCt: smallDiamondCt !== null && smallDiamondCt !== '' ? Number(smallDiamondCt) : null }),
         ...(totalDiamondPcs !== undefined && { totalDiamondPcs: totalDiamondPcs !== null && totalDiamondPcs !== '' ? Number(totalDiamondPcs) : null }),
         ...(diamondGrade !== undefined && { diamondGrade: diamondGrade || null }),
         ...(seo
@@ -395,17 +389,6 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'UPDATE',
-        adminUserId: req.user?.id,
-        entityType: 'Product',
-        entityId: updated.id,
-        before: existing as any,
-        after: updated as any,
-        note: `Updated product ${updated.name}`,
-      },
-    });
 
     return sendSuccess(res, updated, 'Product updated successfully');
   } catch (error) {
@@ -427,16 +410,6 @@ export const deleteProduct = async (req: AuthenticatedRequest, res: Response) =>
       data: { deletedAt: new Date(), isPublished: false },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'DELETE',
-        adminUserId: req.user?.id,
-        entityType: 'Product',
-        entityId: id,
-        before: existing as any,
-        note: `Soft deleted product ${existing.name}`,
-      },
-    });
 
     return sendSuccess(res, null, 'Product deleted successfully');
   } catch (error) {
@@ -459,17 +432,6 @@ export const publishProduct = async (req: AuthenticatedRequest, res: Response) =
       data: { isPublished: isPublished !== undefined ? Boolean(isPublished) : !existing.isPublished },
     });
 
-    await logAudit({
-      action: updated.isPublished ? 'PUBLISH' : 'UNPUBLISH',
-      adminUserId: req.user?.id,
-      entityType: 'Product',
-      entityId: updated.id,
-      before: { isPublished: existing.isPublished },
-      after: { isPublished: updated.isPublished },
-      note: `Product ${existing.name} ${updated.isPublished ? 'published' : 'unpublished'}`,
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent'),
-    });
 
     return sendSuccess(res, updated, `Product ${updated.isPublished ? 'published' : 'unpublished'} successfully`);
   } catch (error) {
@@ -496,14 +458,6 @@ export const createVariant = async (req: AuthenticatedRequest, res: Response) =>
       include: { images: { orderBy: { sortOrder: 'asc' } } },
     });
 
-    await logAudit({
-      action: 'CREATE',
-      adminUserId: req.user?.id,
-      entityType: 'ProductVariant',
-      entityId: variant.id,
-      after: variant,
-      note: `Created variant ${metalFinish} for product ${existing.name}`,
-    });
 
     return sendSuccess(res, variant, 'Variant created', 201);
   } catch (error) {
@@ -532,15 +486,6 @@ export const updateVariant = async (req: AuthenticatedRequest, res: Response) =>
       include: { images: { orderBy: { sortOrder: 'asc' } } },
     });
 
-    await logAudit({
-      action: 'UPDATE',
-      adminUserId: req.user?.id,
-      entityType: 'ProductVariant',
-      entityId: updated.id,
-      before: variant,
-      after: updated,
-      note: `Updated variant ${updated.metalFinish}`,
-    });
 
     return sendSuccess(res, updated, 'Variant updated');
   } catch (error) {
@@ -556,14 +501,6 @@ export const deleteVariant = async (req: AuthenticatedRequest, res: Response) =>
 
     await prisma.productVariant.delete({ where: { id: variantId } });
 
-    await logAudit({
-      action: 'DELETE',
-      adminUserId: req.user?.id,
-      entityType: 'ProductVariant',
-      entityId: variantId,
-      before: variant,
-      note: `Deleted variant ${variant.metalFinish}`,
-    });
 
     return sendSuccess(res, null, 'Variant deleted');
   } catch (error) {
@@ -607,14 +544,6 @@ export const addVariantImage = async (req: AuthenticatedRequest, res: Response) 
       data: { variantId, url, thumbnailUrl: thumbnailUrl || null, altText, sortOrder: sortOrder ?? 0, isPrimary: isPrimary || false },
     });
 
-    await logAudit({
-      action: 'CREATE',
-      adminUserId: req.user?.id,
-      entityType: 'VariantImage',
-      entityId: image.id,
-      after: image,
-      note: `Added variant image for variant ${variant.metalFinish}`,
-    });
 
     return sendSuccess(res, image, 'Image added', 201);
   } catch (error) {
@@ -630,14 +559,6 @@ export const deleteVariantImage = async (req: AuthenticatedRequest, res: Respons
 
     await prisma.variantImage.delete({ where: { id: imageId } });
 
-    await logAudit({
-      action: 'DELETE',
-      adminUserId: req.user?.id,
-      entityType: 'VariantImage',
-      entityId: imageId,
-      before: img,
-      note: `Deleted variant image`,
-    });
 
     return sendSuccess(res, null, 'Image deleted');
   } catch (error) {
@@ -667,14 +588,6 @@ export const reorderVariantImages = async (req: AuthenticatedRequest, res: Respo
       orderBy: { sortOrder: 'asc' },
     });
 
-    await logAudit({
-      action: 'UPDATE',
-      adminUserId: req.user?.id,
-      entityType: 'VariantImage',
-      entityId: variantId,
-      after: { reorderedImagesCount: images.length },
-      note: `Reordered variant images for variant ${variantId}`,
-    });
 
     return sendSuccess(res, updated, 'Images reordered');
   } catch (error) {

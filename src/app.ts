@@ -22,7 +22,9 @@ app.use(cors({
     if (!origin || env.CORS_ORIGIN.includes(origin) || env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // Reject without throwing so the API does not answer 500; the browser blocks it.
+      logger.warn(`CORS blocked origin "${origin}". Allowed: ${env.CORS_ORIGIN.join(', ')}`);
+      callback(null, false);
     }
   },
   credentials: true,

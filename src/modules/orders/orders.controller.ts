@@ -198,16 +198,6 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'Order',
-        entityId: order.id,
-        after: order as any,
-        note: `Created order ${order.orderNumber}`,
-      },
-    });
 
     return sendSuccess(res, order, 'Order created successfully', 201);
   } catch (error) {
@@ -256,17 +246,6 @@ export const updateOrderStatus = async (req: AuthenticatedRequest, res: Response
       include: { customer: true, items: true },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'UPDATE',
-        adminUserId: req.user?.id,
-        entityType: 'Order',
-        entityId: order.id,
-        before: { status: order.status },
-        after: { status: updatedOrder.status },
-        note: `Order ${order.orderNumber} status changed to ${status}`,
-      },
-    });
 
     return sendSuccess(res, updatedOrder, 'Order status updated successfully');
   } catch (error) {

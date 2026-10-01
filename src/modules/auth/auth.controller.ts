@@ -23,15 +23,6 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await comparePassword(password, admin.passwordHash);
     if (!isMatch) {
       // Log failed attempt
-      await prisma.auditLog.create({
-        data: {
-          action: 'LOGIN_FAILED',
-          adminUserId: admin.id,
-          note: `Failed login attempt for ${email}`,
-          ipAddress: req.ip,
-          userAgent: req.get('user-agent'),
-        },
-      });
       return sendError(res, 'Invalid credentials', 401);
     }
 
@@ -49,15 +40,6 @@ export const login = async (req: Request, res: Response) => {
     });
 
     // Audit log success
-    await prisma.auditLog.create({
-      data: {
-        action: 'LOGIN',
-        adminUserId: admin.id,
-        note: `Successful login for ${email}`,
-        ipAddress: req.ip,
-        userAgent: req.get('user-agent'),
-      },
-    });
 
     return sendSuccess(res, {
       user: {
@@ -117,15 +99,6 @@ export const logout = async (req: AuthenticatedRequest, res: Response) => {
         data: { refreshToken: null },
       });
 
-      await prisma.auditLog.create({
-        data: {
-          action: 'LOGOUT',
-          adminUserId: req.user.id,
-          note: `User logged out`,
-          ipAddress: req.ip,
-          userAgent: req.get('user-agent'),
-        },
-      });
     }
 
     return sendSuccess(res, null, 'Logged out successfully');

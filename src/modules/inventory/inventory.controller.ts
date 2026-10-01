@@ -143,17 +143,6 @@ export const adjustStock = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'STOCK_ADJUSTMENT',
-        adminUserId: req.user?.id,
-        entityType: 'InventoryItem',
-        entityId: inventoryItemId,
-        before: { quantity: item.quantity },
-        after: { quantity: newQuantity },
-        note: `Adjusted stock for ${updatedItem.product.name} by ${delta} (${type})`,
-      },
-    });
 
     return sendSuccess(res, { item: updatedItem, movement }, 'Stock adjusted successfully');
   } catch (error) {

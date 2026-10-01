@@ -34,7 +34,7 @@ const CONTEXT_RATIOS: Record<string, { ratio: number; label: string; tolerance: 
 
 // MIME types sharp can generate thumbnails from (excludes svg, video)
 const THUMBABLE_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const THUMB_WIDTH = 400;
+const THUMB_WIDTH = 800;
 
 function thumbPathFor(filePath: string): string {
   const dir = path.dirname(filePath);
@@ -176,16 +176,6 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
       },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'MediaAsset',
-        entityId: mediaAsset.id,
-        after: mediaAsset as any,
-        note: `Uploaded media asset ${mediaAsset.originalName}`,
-      },
-    });
 
     return sendSuccess(res, mediaAsset, 'Media uploaded successfully', 201);
   } catch (error) {
@@ -254,16 +244,6 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
 
     await prisma.mediaAsset.delete({ where: { id } });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'DELETE',
-        adminUserId: req.user?.id,
-        entityType: 'MediaAsset',
-        entityId: id,
-        before: asset as any,
-        note: `Deleted media asset ${asset.filename}`,
-      },
-    });
 
     return sendSuccess(res, null, 'Media asset deleted successfully');
   } catch (error) {

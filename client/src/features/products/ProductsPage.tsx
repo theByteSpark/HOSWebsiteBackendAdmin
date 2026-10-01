@@ -8,9 +8,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SearchInput, Select } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { ProductEditorModal } from './ProductEditorModal';
+import { BulkUploadModal } from './BulkUploadModal';
 import { formatCurrency, formatDate } from '@/lib/format';
 import type { Product, ProductCategory } from '@/types';
-import { Plus, Gem, Check, Eye, Loader2 } from 'lucide-react';
+import { Plus, Gem, Check, Eye, Loader2, FileSpreadsheet } from 'lucide-react';
 
 import { ConfirmDialog } from '@/components/ui/Modal';
 
@@ -47,6 +48,7 @@ export const ProductsPage: React.FC = () => {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
 
   // Fetch categories
   const { data: categoriesData } = useQuery<{ categories: ProductCategory[] }>({
@@ -98,16 +100,6 @@ export const ProductsPage: React.FC = () => {
   const totalPages = data?.totalPages || 1;
   const totalItems = data?.total || 0;
 
-  const handleTogglePublish = async (p: Product, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await apiClient.patch(`/products/${p.id}/publish`, { isPublished: !p.isPublished });
-      refetch();
-    } catch (err) {
-      console.error('Failed to toggle publish', err);
-    }
-  };
-
   const columns: Column<Product>[] = [
     {
       header: 'Jewelry Piece',
@@ -117,6 +109,7 @@ export const ProductsPage: React.FC = () => {
         const pick = (img?: { url: string; thumbnailUrl?: string | null } | null) =>
           img ? (img.thumbnailUrl || img.url) : null;
         const primaryImg =
+          pick(row.images?.slice().sort((a, b) => a.sortOrder - b.sortOrder)[0]) ||
           pick(ygVariant?.images?.find(i => i.isPrimary)) ||
           pick(ygVariant?.images?.[0]) ||
           pick(row.variants?.flatMap(v => v.images || []).find(i => i.isPrimary)) ||
@@ -170,18 +163,6 @@ export const ProductsPage: React.FC = () => {
       ),
     },
     {
-      header: 'Website Status',
-      accessor: (row) => (
-        <button
-          type="button"
-          onClick={(e) => handleTogglePublish(row, e)}
-          className="cursor-pointer"
-        >
-          <StatusBadge status={row.isPublished ? 'PUBLISHED' : 'DRAFT'} />
-        </button>
-      ),
-    },
-    {
       header: 'Actions',
       accessor: (row) => (
         <div className="flex items-center gap-2">
@@ -217,15 +198,20 @@ export const ProductsPage: React.FC = () => {
         title="Products & Catalog"
         description="Manage House of Seya luxury jewelry items, diamond attributes, and publishing."
         action={
-          <Button
-            size="sm"
-            onClick={() => {
-              setEditingProduct(null);
-              setIsModalOpen(true);
-            }}
-          >
-            <Plus className="h-4 w-4 mr-1" /> Add Product
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setIsBulkOpen(true)}>
+              <FileSpreadsheet className="h-4 w-4 mr-1" /> Bulk Upload (Excel)
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingProduct(null);
+                setIsModalOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" /> Add Product
+            </Button>
+          </div>
         }
       />
 
@@ -291,6 +277,12 @@ export const ProductsPage: React.FC = () => {
         totalItems={totalItems}
         pageSize={15}
         onPageChange={setPage}
+      />
+
+      <BulkUploadModal
+        isOpen={isBulkOpen}
+        onClose={() => setIsBulkOpen(false)}
+        onUploaded={refetch}
       />
 
       {/* Product Editor Modal */}

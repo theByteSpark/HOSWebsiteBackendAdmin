@@ -3,7 +3,6 @@ import { prisma } from '../../config/db';
 import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AuthenticatedRequest } from '../../middleware/auth.middleware';
-import { logAudit } from '../../utils/auditLogger';
 
 // ----------------------------------------------------
 // PRODUCT CATEGORIES
@@ -102,16 +101,6 @@ export const createCategory = async (req: AuthenticatedRequest, res: Response) =
       include: { subcategories: true, seo: true },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'CREATE',
-        adminUserId: req.user?.id,
-        entityType: 'ProductCategory',
-        entityId: newCategory.id,
-        after: newCategory as any,
-        note: `Created category ${newCategory.name}`,
-      },
-    });
 
     return sendSuccess(res, newCategory, 'Category created successfully', 201);
   } catch (error) {
@@ -159,17 +148,6 @@ export const updateCategory = async (req: AuthenticatedRequest, res: Response) =
       include: { subcategories: true, seo: true },
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'UPDATE',
-        adminUserId: req.user?.id,
-        entityType: 'ProductCategory',
-        entityId: updated.id,
-        before: existing as any,
-        after: updated as any,
-        note: `Updated category ${updated.name}`,
-      },
-    });
 
     return sendSuccess(res, updated, 'Category updated successfully');
   } catch (error) {
@@ -195,16 +173,6 @@ export const deleteCategory = async (req: AuthenticatedRequest, res: Response) =
     await prisma.subcategory.deleteMany({ where: { categoryId: id } });
     await prisma.productCategory.delete({ where: { id } });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'DELETE',
-        adminUserId: req.user?.id,
-        entityType: 'ProductCategory',
-        entityId: id,
-        before: existing as any,
-        note: `Deleted category ${existing.name}`,
-      },
-    });
 
     return sendSuccess(res, null, 'Category deleted successfully');
   } catch (error) {
@@ -256,14 +224,6 @@ export const createSubcategory = async (req: AuthenticatedRequest, res: Response
       include: { seo: true },
     });
 
-    await logAudit({
-      action: 'CREATE',
-      adminUserId: req.user?.id,
-      entityType: 'Subcategory',
-      entityId: subcategory.id,
-      after: subcategory,
-      note: `Created subcategory ${subcategory.name}`,
-    });
 
     return sendSuccess(res, subcategory, 'Subcategory created successfully', 201);
   } catch (error) {
@@ -323,15 +283,6 @@ export const updateSubcategory = async (req: AuthenticatedRequest, res: Response
       include: { seo: true },
     });
 
-    await logAudit({
-      action: 'UPDATE',
-      adminUserId: req.user?.id,
-      entityType: 'Subcategory',
-      entityId: updated.id,
-      before: existing,
-      after: updated,
-      note: `Updated subcategory ${updated.name}`,
-    });
 
     return sendSuccess(res, updated, 'Subcategory updated successfully');
   } catch (error) {
@@ -353,14 +304,6 @@ export const deleteSubcategory = async (req: AuthenticatedRequest, res: Response
     await prisma.subcategorySEO.deleteMany({ where: { subcategoryId: id } });
     await prisma.subcategory.delete({ where: { id } });
 
-    await logAudit({
-      action: 'DELETE',
-      adminUserId: req.user?.id,
-      entityType: 'Subcategory',
-      entityId: id,
-      before: existing,
-      note: `Deleted subcategory ${existing?.name || id}`,
-    });
 
     return sendSuccess(res, null, 'Subcategory deleted successfully');
   } catch (error) {

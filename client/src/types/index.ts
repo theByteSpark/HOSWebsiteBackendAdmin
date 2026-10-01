@@ -196,6 +196,7 @@ export interface Product {
   isMadeToOrder: boolean;
   netWeightGrams?: number | string | null;
   totalDiamondCt?: number | string | null;
+  smallDiamondCt?: number | string | null;
   totalDiamondPcs?: number | null;
   diamondGrade?: string | null;
   images: ProductImage[];
@@ -230,63 +231,6 @@ export interface InventoryItem {
   updatedAt: string;
 }
 
-export interface HeroSlide {
-  id: string;
-  image: string;
-  tagline?: string | null;
-  title: string;
-  cta?: string | null;
-  href: string;
-  sortOrder: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Review {
-  id: string;
-  name: string;
-  location?: string | null;
-  quote: string;
-  imageUrl?: string | null;
-  rating: number;
-  productName?: string | null;
-  productId?: string | null;
-  verified: boolean;
-  isPublished: boolean;
-  reviewDate?: string | null;
-  source?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt?: string | null;
-  body?: string | null;
-  imageUrl?: string | null;
-  categoryId?: string | null;
-  isPublished: boolean;
-  publishedAt?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface FAQ {
-  id: string;
-  categoryId: string;
-  category?: { id: string; name: string };
-  question: string;
-  answer: string;
-  context: 'GENERAL' | 'PRODUCT' | 'DIAMOND_EDUCATION' | 'CUSTOMISE' | 'GIFTING' | 'COLLECTION';
-  sortOrder: number;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface PageContent {
   id: string;
   slug: string;
@@ -295,38 +239,6 @@ export interface PageContent {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface SiteSettings {
-  id: string;
-  whatsappNumber: string;
-  contactEmail?: string | null;
-  contactPhone?: string | null;
-  instagramUrl?: string | null;
-  facebookUrl?: string | null;
-  youtubeUrl?: string | null;
-  footerTagline?: string | null;
-  footerCopyright?: string | null;
-  announcementMessages: string[];
-  promises: string[];
-  pressNames: string[];
-  freeShippingThreshold?: number | string | null;
-  updatedAt: string;
-}
-
-export interface AuditLog {
-  id: string;
-  adminUserId?: string | null;
-  admin?: AdminUser | null;
-  action: string;
-  entityType?: string | null;
-  entityId?: string | null;
-  before?: any;
-  after?: any;
-  note?: string | null;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  createdAt: string;
 }
 
 export interface NotificationItem {

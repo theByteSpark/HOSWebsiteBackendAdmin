@@ -11,7 +11,9 @@ export const env = {
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'hos_refresh_secret_fallback',
   JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-  CORS_ORIGIN: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
+  CORS_ORIGIN: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim().replace(/^["']|["']$/g, '').replace(/\/+$/, '')).filter(Boolean)
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
   UPLOAD_DIR: path.resolve(process.env.UPLOAD_DIR || './uploads'),
   PUBLIC_MEDIA_URL: process.env.PUBLIC_MEDIA_URL || 'http://localhost:4000/uploads',
 };
