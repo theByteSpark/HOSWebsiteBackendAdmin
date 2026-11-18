@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #f1f3ec;
+  --color-brand-100: #e2e6d6;
+  --color-brand-200: #c5cdae;
+  --color-brand-300: #a6b283;
+  --color-brand-400: #85945e;
+  --color-brand-500: #66753f;
+  --color-brand-600: #505d30;
+  --color-brand-700: #414b28;
+  --color-brand-800: #313820;
+  --color-brand-900: #1f2414;
+
+  --color-graphite-50: #f7f8f9;
+  --color-graphite-100: #eef0f2;
+  --color-graphite-200: #dde1e6;
+  --color-graphite-300: #c3c9d1;
+  --color-graphite-400: #9aa3af;
+  --color-graphite-500: #717b89;
+  --color-graphite-600: #545d6b;
+  --color-graphite-700: #3d4552;
+  --color-graphite-800: #262c36;
+  --color-graphite-900: #171b22;
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-graphite-50);
+  color: var(--color-graphite-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}
+
+/* ── Blog rich text editor / preview content ───────────────────────────────
+   Tailwind's preflight strips default heading/list styles, so restore them
+   for anything inside .rte-content (the TipTap editor surface). */
+.rte-content {
+  color: var(--color-graphite-800);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.rte-content > * + * { margin-top: 0.85em; }
+.rte-content h2 { font-size: 1.5rem; line-height: 1.3; font-weight: 700; margin-top: 1.4em; }
+.rte-content h3 { font-size: 1.25rem; line-height: 1.35; font-weight: 700; margin-top: 1.25em; }
+.rte-content h4 { font-size: 1.05rem; font-weight: 700; margin-top: 1.1em; }
+.rte-content ul { list-style: disc; padding-left: 1.6rem; }
+.rte-content ol { list-style: decimal; padding-left: 1.6rem; }
+.rte-content li > p { margin: 0; }
+.rte-content blockquote {
+  border-left: 3px solid var(--color-brand-300);
+  padding-left: 1rem;
+  color: var(--color-graphite-600);
+  font-style: italic;
+}
+.rte-content a { color: var(--color-brand-700); text-decoration: underline; }
+.rte-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin-inline: auto; display: block; }
+.rte-content img.ProseMirror-selectednode { outline: 2px solid var(--color-brand-500); }
+.rte-content hr { border: 0; border-top: 1px solid var(--color-graphite-200); margin: 1.5em 0; }
+.rte-content code { background: var(--color-graphite-100); padding: 0.1em 0.35em; border-radius: 0.25rem; font-size: 0.875em; }
+.rte-content pre { background: var(--color-graphite-100); padding: 0.75rem 1rem; border-radius: 0.5rem; overflow-x: auto; }
+.rte-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-graphite-400);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.rte-content:focus, .ProseMirror:focus { outline: none; }
+.rte-content table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+.rte-content th, .rte-content td { border: 1px solid var(--color-graphite-300); padding: 0.4rem 0.6rem; vertical-align: top; text-align: left; }
+.rte-content th { background: var(--color-graphite-100); font-weight: 700; }
+.rte-content .selectedCell { background: var(--color-brand-100); }

@@ -1,0 +1,320 @@
+export type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'STAFF' | 'SEO_MANAGER';
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: AdminRole;
+  isActive: boolean;
+  lastLoginAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type OrderStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'IN_PRODUCTION'
+  | 'READY_TO_SHIP'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'RETURNED';
+
+export type OrderChannel = 'WHATSAPP' | 'WEBSITE' | 'PHONE' | 'WALK_IN';
+
+export type PaymentStatus = 'UNPAID' | 'PARTIAL' | 'PAID' | 'REFUNDED';
+
+export type CustomerSource = 'WHATSAPP' | 'WEBSITE' | 'WALK_IN' | 'PHONE' | 'REFERRAL';
+
+export interface CustomerAddress {
+  id?: string;
+  label?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state?: string;
+  pincode: string;
+  country: string;
+  isDefault?: boolean;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  whatsapp?: string | null;
+  source?: CustomerSource | null;
+  tags: string[];
+  notes?: string | null;
+  totalOrderValue: number | string;
+  orderCount: number;
+  addresses?: CustomerAddress[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number | string;
+  lineTotal: number | string;
+  metalFinish?: string | null;
+  notes?: string | null;
+  product?: Product;
+}
+
+export interface OrderTimelineEntry {
+  status: OrderStatus;
+  timestamp: string;
+  note?: string;
+  adminId?: string;
+  adminName?: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customer: Customer;
+  assignedToId?: string | null;
+  assignedTo?: AdminUser | null;
+  status: OrderStatus;
+  channel: OrderChannel;
+  items: OrderItem[];
+  shippingAddress?: CustomerAddress | null;
+  subtotal: number | string;
+  tax: number | string;
+  discount: number | string;
+  total: number | string;
+  paymentStatus: PaymentStatus;
+  paymentMethod?: string | null;
+  internalNotes?: string | null;
+  customerNote?: string | null;
+  trackingNumber?: string | null;
+  courier?: string | null;
+  deliveredAt?: string | null;
+  cancelledAt?: string | null;
+  timeline?: OrderTimelineEntry[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductCategory {
+  id: string;
+  slug: string;
+  name: string;
+  image?: string | null;
+  bannerImage?: string | null;
+  bannerTagline?: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+  subcategories?: Subcategory[];
+  _count?: {
+    products?: number;
+    subcategories?: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Subcategory {
+  id: string;
+  slug: string;
+  name: string;
+  categoryId: string;
+  category?: ProductCategory;
+  sortOrder: number;
+  isPublished: boolean;
+  _count?: {
+    products?: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductImage {
+  id: string;
+  productId: string;
+  url: string;
+  thumbnailUrl?: string | null;
+  altText?: string | null;
+  sortOrder: number;
+  isHover: boolean;
+}
+
+export interface VariantImage {
+  id: string;
+  variantId: string;
+  url: string;
+  thumbnailUrl?: string | null;
+  altText?: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+  createdAt: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  productId: string;
+  metalFinish: string;
+  swatchColor?: string | null;
+  priceOffset?: number | string | null;
+  isDefault: boolean;
+  inStock: boolean;
+  sku?: string | null;
+  images: VariantImage[];
+}
+
+export interface ProductSEO {
+  id?: string;
+  productId?: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImageUrl?: string | null;
+}
+
+export interface Product {
+  id: string;
+  slug: string;
+  name: string;
+  sku?: string | null;
+  categoryId: string;
+  category?: ProductCategory;
+  subcategoryId?: string | null;
+  subcategory?: Subcategory | null;
+  price: number | string;
+  originalPrice?: number | string | null;
+  description?: string | null;
+  shortDescription?: string | null;
+  isPublished: boolean;
+  inStock: boolean;
+  isMadeToOrder: boolean;
+  netWeightGrams?: number | string | null;
+  totalDiamondCt?: number | string | null;
+  smallDiamondCt?: number | string | null;
+  totalDiamondPcs?: number | null;
+  diamondGrade?: string | null;
+  images: ProductImage[];
+  variants: ProductVariant[];
+  seo?: ProductSEO | null;
+  sortOrder: number;
+  inventory?: InventoryItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type StockMovementType = 'RESTOCK' | 'SALE' | 'ADJUSTMENT' | 'RETURN';
+
+export interface StockMovement {
+  id: string;
+  inventoryItemId: string;
+  type: StockMovementType;
+  quantity: number;
+  reason?: string | null;
+  adminUserId?: string | null;
+  createdAt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  productId: string;
+  product: Product;
+  variantId?: string | null;
+  quantity: number;
+  reorderLevel: number;
+  movements?: StockMovement[];
+  updatedAt: string;
+}
+
+export interface PageContent {
+  id: string;
+  slug: string;
+  title: string;
+  content: any;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  adminUserId?: string | null;
+  type: string;
+  title: string;
+  body: string;
+  entityType?: string | null;
+  entityId?: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface MediaAsset {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  path: string;
+  url: string;
+  thumbnailUrl?: string | null;
+  folder?: string | null;
+  altText?: string | null;
+  createdAt: string;
+}
+
+export interface NavigationItem {
+  id: string;
+  label: string;
+  href: string;
+  parentId?: string | null;
+  children?: NavigationItem[];
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface DashboardStats {
+  revenueToday: number;
+  revenue7d: number;
+  revenue30d: number;
+  revenueMtd: number;
+  revenueYtd: number;
+  revenueChange7d?: number;
+  revenueChange30d?: number;
+  orderCountToday: number;
+  orderCount30d: number;
+  pendingOrdersCount: number;
+  lowStockCount: number;
+  pendingReviewsCount: number;
+  ordersByStatus: Record<string, number>;
+  revenueChart?: { date: string; revenue: number; orders: number }[];
+  recentOrders?: Order[];
+  topProducts?: { id: string; name: string; salesCount: number; totalRevenue: number }[];
+}
+
+export type BlogStatus = 'DRAFT' | 'PUBLISHED';
+
+export interface BlogSummary {
+  id: string;
+  slug: string;
+  title: string;
+  coverImage?: string | null;
+  status: BlogStatus;
+  publishedAt?: string | null;
+  authorName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Blog extends BlogSummary {
+  excerpt?: string | null;
+  coverImageAlt?: string | null;
+  content: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaKeywords: string[];
+}

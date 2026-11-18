@@ -1,0 +1,1889 @@
+{
+  "metadata": {
+    "extractedAt": "2026-09-22T17:45:35.753Z",
+    "source": "c:/byte spark/houseofseya/houseofseyaStaticwebsite",
+    "version": "1.0.0"
+  },
+  "categories": [
+    {
+      "id": "earrings",
+      "name": "Earrings",
+      "image": "https://images.unsplash.com/photo-1693212793204-bcea856c75fe?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxkaWFtb25kJTIwZWFycmluZ3N8ZW58MHx8fHwxNzg0OTEyNDY1fDA&ixlib=rb-4.1.0&q=85&w=1000",
+      "href": "/collections/earrings"
+    },
+    {
+      "id": "bracelets",
+      "name": "Bracelets",
+      "image": "https://images.pexels.com/photos/5370644/pexels-photo-5370644.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000",
+      "href": "/collections/bracelets"
+    },
+    {
+      "id": "necklaces",
+      "name": "Necklaces",
+      "image": "https://images.pexels.com/photos/20838859/pexels-photo-20838859.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000",
+      "href": "/collections/necklaces"
+    }
+  ],
+  "products": [
+    {
+      "id": "earrings-1",
+      "slug": "earrings-1",
+      "name": "Solitaire Studs",
+      "category": "earrings",
+      "subcategorySlug": "solitaire-studs",
+      "price": 133167,
+      "image": "https://images.unsplash.com/photo-1693212793204-bcea856c75fe?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "hoverImage": "https://images.unsplash.com/photo-1693213085235-ea6deadf8cee?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": true,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.50",
+      "description": "The Solitaire Studs is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "earrings-2",
+      "slug": "earrings-2",
+      "name": "Hoops & Huggies",
+      "category": "earrings",
+      "subcategorySlug": "hoops-huggies",
+      "price": 56850,
+      "image": "https://images.unsplash.com/photo-1693213085235-ea6deadf8cee?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "hoverImage": "https://images.pexels.com/photos/5370644/pexels-photo-5370644.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "inStock": false,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.75",
+      "description": "The Hoops & Huggies is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "earrings-3",
+      "slug": "earrings-3",
+      "name": "Other Studs",
+      "category": "earrings",
+      "subcategorySlug": "other-studs",
+      "price": 101496,
+      "image": "https://images.pexels.com/photos/5370644/pexels-photo-5370644.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "hoverImage": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "inStock": true,
+      "metal": "24K Gold Vermeil",
+      "carat": "1.00",
+      "description": "The Other Studs is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "earrings-4",
+      "slug": "earrings-4",
+      "name": "Halo Studs",
+      "category": "earrings",
+      "subcategorySlug": "halo-studs",
+      "price": 123495,
+      "image": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "hoverImage": "https://images.unsplash.com/photo-1631897817977-a1005c199b36?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": false,
+      "metal": "24K Gold Vermeil",
+      "carat": "1.25",
+      "description": "The Halo Studs is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "bracelets-1",
+      "slug": "bracelets-1",
+      "name": "Tennis Bracelet",
+      "category": "bracelets",
+      "subcategorySlug": "tennis-bracelet",
+      "price": 197704,
+      "image": "https://images.pexels.com/photos/5370644/pexels-photo-5370644.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "hoverImage": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "inStock": true,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.50",
+      "description": "The Tennis Bracelet is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "bracelets-2",
+      "slug": "bracelets-2",
+      "name": "Station Bracelet",
+      "category": "bracelets",
+      "subcategorySlug": "station-bracelet",
+      "price": 164882,
+      "image": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "hoverImage": "https://images.unsplash.com/photo-1631897817977-a1005c199b36?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": false,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.75",
+      "description": "The Station Bracelet is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "necklaces-1",
+      "slug": "necklaces-1",
+      "name": "Pendants",
+      "category": "necklaces",
+      "subcategorySlug": "pendants",
+      "price": 68598,
+      "image": "https://images.unsplash.com/photo-1631897817977-a1005c199b36?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "hoverImage": "https://images.pexels.com/photos/30720972/pexels-photo-30720972.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "inStock": true,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.50",
+      "description": "The Pendants is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "necklaces-2",
+      "slug": "necklaces-2",
+      "name": "Pendant Sets",
+      "category": "necklaces",
+      "subcategorySlug": "pendant-sets",
+      "price": 186834,
+      "image": "https://images.pexels.com/photos/30720972/pexels-photo-30720972.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "hoverImage": "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": false,
+      "metal": "24K Gold Vermeil",
+      "carat": "0.75",
+      "description": "The Pendant Sets is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "necklaces-3",
+      "slug": "necklaces-3",
+      "name": "Mangalsutra",
+      "category": "necklaces",
+      "subcategorySlug": "mangalsutra",
+      "price": 151578,
+      "image": "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "hoverImage": "https://images.unsplash.com/photo-1624588057318-5f1b2eb81012?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": true,
+      "metal": "24K Gold Vermeil",
+      "carat": "1.00",
+      "description": "The Mangalsutra is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    },
+    {
+      "id": "necklaces-4",
+      "slug": "necklaces-4",
+      "name": "Trinket Necklace",
+      "category": "necklaces",
+      "subcategorySlug": "trinket-necklace",
+      "price": 184701,
+      "image": "https://images.unsplash.com/photo-1624588057318-5f1b2eb81012?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "hoverImage": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "inStock": false,
+      "metal": "24K Gold Vermeil",
+      "carat": "1.25",
+      "description": "The Trinket Necklace is crafted for everyday luxury — a lab-grown diamond piece designed to be worn effortlessly, from morning meetings to evening celebrations."
+    }
+  ],
+  "subcategoryContent": {
+    "solitaire-studs": {
+      "metaTitle": "Buy Solitaire Studs Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What are solitaire studs, and what makes House of Seya's special?",
+          "a": "A solitaire stud features a single, brilliant lab-grown diamond as the centerpiece — clean, timeless, and endlessly wearable. Every House of Seya solitaire diamond is IGI certified, so the brilliance you see is backed by independent, verifiable documentation."
+        },
+        {
+          "q": "How can I be sure of the quality of the diamond used?",
+          "a": "Every solitaire diamond is IGI certified, with cut, color, clarity, and carat weight independently graded and documented. You receive the certificate with your piece, so you're never just taking our word for it."
+        },
+        {
+          "q": "What carat or size should I pick for everyday wear?",
+          "a": "For daily wear, smaller sizes sit close to the ear and stay elegant without drawing too much attention. If you want your studs to double as evening wear too, sizing up slightly adds presence without tipping into statement territory."
+        },
+        {
+          "q": "Is the gold vermeil setting durable enough for daily wear?",
+          "a": "Yes. Each diamond is set in 24K gold vermeil plated at 2.5 microns — the genuine minimum for the vermeil label, well above the roughly 0.5 microns typical of ordinary gold plating — so the setting is built to handle daily wear and water exposure, including showers."
+        },
+        {
+          "q": "How should I maintain and care for my solitaire studs?",
+          "a": "Store them in a dry, airtight pouch away from direct sunlight, and put them on after applying makeup, perfume, or hairspray, not before. A soft wipe after each wear keeps both the diamond and its setting looking freshly new."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Solitaire Studs Online | House of Seya",
+        "intro": "At the heart of every House of Seya solitaire stud is a single, genuine lab-grown diamond — IGI certified, brilliantly cut, and set to catch the light from every angle. In a category crowded with vague quality claims, we lead with documentation: every diamond you buy from us comes with proof of exactly what it is.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Solitaire Studs?",
+            "body": "A solitaire stud is the simplest test of a diamond's quality — there's nowhere for a weak cut or poor clarity to hide behind. That's exactly why we hold every solitaire diamond to the same IGI-certified standard, whatever its size. Choosing lab-grown also means choosing a clean, conflict-free origin, without paying the premium that mined diamonds carry for the same brilliance."
+          },
+          {
+            "title": "The House of Seya Collection: Quiet Confidence, Everyday Brilliance",
+            "body": "Our solitaire studs range from delicate, barely-there sizes perfect for first-time diamond buyers to bolder carats for those who want their solitaire to make more of a statement. Every design shares the same DNA: a single diamond, honestly graded, set in richly plated 24K gold vermeil that's built to be worn constantly, not saved for occasions."
+          },
+          {
+            "title": "Shop Solitaire Studs Online in India",
+            "body": "Buying a diamond online should feel as trustworthy as buying one in person. That's why every House of Seya solitaire stud ships with its IGI certificate, secure tracked delivery, and the backing of our 7-day return window — so you can shop with the same confidence you'd have standing in front of a jeweler's counter."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our solitaire stud collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Gift That Speaks for Itself",
+        "closing": "Few gifts feel as universally right as a solitaire diamond stud. It suits any age, any style, any occasion — a first diamond, a milestone gift, or simply a treat that says someone was paying attention. Paired with a certificate of authenticity, it's a gift that carries real, provable value.\n\nEvery House of Seya solitaire tells the same story: a real diamond, honestly certified, set to be worn every single day."
+      }
+    },
+    "halo-studs": {
+      "metaTitle": "Buy Halo Studs Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What is a halo stud, and what makes the diamond setup special?",
+          "a": "A halo stud surrounds a central IGI-certified lab-grown diamond with a circle of smaller pavé diamonds, making the center stone appear larger and catch more light — maximum brilliance for the same core carat size."
+        },
+        {
+          "q": "How can I be sure of the quality of the diamonds in the halo?",
+          "a": "The center diamond and every surrounding pavé stone are genuine lab-grown diamonds, with the center stone IGI certified for cut, color, clarity, and carat weight — full transparency on exactly what you're wearing."
+        },
+        {
+          "q": "Are halo studs suitable for everyday wear?",
+          "a": "Yes. While halos offer more sparkle than a solitaire, they stay compact and close to the ear, reading as polished rather than flashy — ideal for anyone who wants a bit more brilliance in their daily rotation."
+        },
+        {
+          "q": "Is the gold vermeil setting strong enough to hold all the pavé stones securely?",
+          "a": "Yes. Our 2.5-micron 24K gold vermeil gives the halo setting the strength to keep every small stone flush and secure, while remaining safe for daily wear and showers."
+        },
+        {
+          "q": "How should I maintain and care for my halo studs?",
+          "a": "Wipe gently with a soft cloth after each wear, store away from other jewelry to prevent scratching the delicate pavé detailing, and avoid prolonged exposure to chlorine or harsh chemicals."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Halo Studs Online | House of Seya",
+        "intro": "Halo studs exist for one reason: to make a diamond look like more than it is, without the price tag of a larger stone. At House of Seya, every halo begins with an IGI-certified center diamond, surrounded by precisely set pavé stones designed to multiply its light.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Halo Studs?",
+            "body": "The halo setting is one of the most technically demanding in fine jewelry — every small stone has to sit flush and secure around the center diamond for the effect to work. We hold that same craftsmanship standard while keeping the core promise simple: a certified diamond at the center, verifiable quality throughout."
+          },
+          {
+            "title": "The House of Seya Collection: Maximum Brilliance, Minimal Effort",
+            "body": "From compact halos designed for daily wear to more elaborate designs with double-halo detailing, our collection is built around one idea — carat-for-carat visual impact. Every setting is finished in 2.5-micron 24K gold vermeil, giving the halo the strength and richness it needs to hold its shape and shine for years."
+          },
+          {
+            "title": "Shop Halo Studs Online in India",
+            "body": "We've made buying a halo stud online as transparent as buying it in person — every center diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our halo stud collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Little More Sparkle, A Lot More Meaning",
+        "closing": "Halo studs make an especially thoughtful gift for milestone moments — birthdays, anniversaries, or any occasion that calls for a bit more shine than an everyday piece. The added brilliance feels special, while the certified diamond underneath ensures it's a gift with lasting, provable value.\n\nEvery House of Seya halo stud is built the same way: real diamonds at the center, honest documentation throughout, and craftsmanship made to last."
+      }
+    },
+    "other-studs": {
+      "metaTitle": "Buy Other Studs Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What kind of diamond designs fall under Other Studs?",
+          "a": "This edit is for distinctive shapes and settings — clusters, geometric cuts, and nature-inspired motifs — each featuring genuine, IGI-certified lab-grown diamonds beyond the classic round solitaire or halo."
+        },
+        {
+          "q": "How can I be sure of the diamond quality in these unconventional designs?",
+          "a": "Every diamond, regardless of the setting's shape, is graded and IGI certified on the same standard: cut, color, clarity, and carat weight — individuality in design, consistency in certification."
+        },
+        {
+          "q": "How do I pick a style that matches my personal taste?",
+          "a": "Think about the jewelry you already reach for most — angular designs suit a clean, geometric taste, while cluster and nature-inspired studs suit anyone drawn to texture and movement."
+        },
+        {
+          "q": "Do these unique settings hold up to daily wear the same way as classic studs?",
+          "a": "Yes — every design in this edit is set in the same 2.5-micron 24K gold vermeil standard used across our collection, so durability and shower-safety never change, no matter how distinctive the shape."
+        },
+        {
+          "q": "How should I maintain and care for my Other Studs?",
+          "a": "Wipe with a soft cloth after wear and store separately to protect intricate settings. Avoid harsh chemicals and prolonged water exposure beyond normal daily wear to keep the finish looking its best."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Other Studs Online | House of Seya",
+        "intro": "Not every diamond needs a round, classic setting. Our Other Studs edit is built for distinctive shapes and settings — every one still centered on a genuine, IGI-certified lab-grown diamond, because individuality shouldn't mean compromising on documented quality.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamonds in Distinctive Settings?",
+            "body": "Unconventional cuts and cluster designs take more technical skill to set securely, without ever compromising the diamond's brilliance. We hold every stone in this edit to the same IGI certification standard as our classic studs, so choosing something different never means choosing something uncertain."
+          },
+          {
+            "title": "The House of Seya Collection: Studs With Personality",
+            "body": "From architectural geometric cuts to soft, nature-inspired clusters, this edit exists for the days you want your earrings to say a little more about who you are. Every setting is finished in the same 2.5-micron 24K gold vermeil we use across our entire collection, so distinctive design never comes at the cost of durability."
+          },
+          {
+            "title": "Shop Other Studs Online in India",
+            "body": "Every diamond in this edit ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — the same trust standards, whatever shape your diamond takes."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our stud collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Gift That Feels Personal",
+        "closing": "Because this edit leans into individuality, it makes for a genuinely considered gift — something that shows you paid attention to someone's actual taste, not just picked the safest option. Paired with full diamond certification, it's a gift that's as thoughtful as it is beautiful.\n\nEvery piece in Other Studs carries the same promise as the rest of our collection: a real, certified diamond, set to last."
+      }
+    },
+    "hoops-huggies": {
+      "metaTitle": "Buy Diamond Hoops & Huggies Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's diamond hoops different from plain gold hoops?",
+          "a": "Ours are set with genuine IGI-certified lab-grown diamonds along the band, so the sparkle moves with you — not just a plain gold hoop, but a certified diamond piece you can wear every day."
+        },
+        {
+          "q": "How can I be sure of the quality of the diamonds set into the hoop?",
+          "a": "Every diamond used in our hoops and huggies is IGI certified, with grading documentation covering cut, color, clarity, and carat weight, so you know exactly what's set into your piece."
+        },
+        {
+          "q": "What size should I choose — hoop or huggie?",
+          "a": "Huggies sit close to the earlobe, generally in the smaller size range, ideal for all-day, low-profile wear. Larger hoops make more of a statement and are great for adding instant polish to a simple outfit."
+        },
+        {
+          "q": "Is the gold vermeil setting shower-safe for daily wear?",
+          "a": "Yes. Our hoops and huggies are finished in 2.5-micron 24K gold vermeil, built specifically to handle daily wear and water exposure, including showers."
+        },
+        {
+          "q": "How should I maintain and care for my hoops or huggies?",
+          "a": "Wipe gently after each wear with a soft cloth, store in a dry pouch away from direct sunlight, and avoid prolonged swimming or contact with strong perfumes and chemicals."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Hoops & Huggies Online | House of Seya",
+        "intro": "Hoops and huggies are the earrings people actually forget they're wearing — which is exactly why every diamond we set into them has to earn its place. Each stone is IGI certified, so the brilliance running along your hoop is fully documented, not just described.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Hoops?",
+            "body": "A hoop or huggie sees more daily wear than almost any other earring style, which makes durability and certified quality non-negotiable. Choosing lab-grown diamonds here means choosing the same hardness and brilliance as mined stones, at a price that makes wearing diamonds daily genuinely realistic."
+          },
+          {
+            "title": "The House of Seya Collection: From Huggie to Statement Hoop",
+            "body": "Our range spans close-to-the-lobe huggies built for all-day comfort to larger, more dramatic hoops designed to elevate a simple outfit instantly. Every piece is finished in 2.5-micron 24K gold vermeil, giving the band real richness and the durability to handle constant wear."
+          },
+          {
+            "title": "Shop Hoops & Huggies Online in India",
+            "body": "Every diamond in our hoop and huggie collection ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — so daily-wear jewelry still comes with full-trust documentation."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our hoop or huggie collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "The Everyday Gift That Never Gets Put Away",
+        "closing": "Because hoops and huggies get worn constantly, they make a gift that stays visibly appreciated long after the occasion has passed. A certified diamond hoop is a gift that becomes part of someone's daily life, not just a special-occasion piece left in a drawer.\n\nEvery House of Seya hoop and huggie is built on the same foundation: certified diamonds, durable 24K vermeil, made for real, everyday wear."
+      }
+    },
+    "all-earrings": {
+      "metaTitle": "Buy Lab-Grown Diamond Earrings Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's lab-grown diamond earrings different from regular jewelry?",
+          "a": "Every earring features a genuine, IGI-certified lab-grown diamond, chemically and optically identical to a mined diamond, set in richly plated 24K gold vermeil — real diamonds, real documentation, without the mined-diamond price tag."
+        },
+        {
+          "q": "Are all your diamonds IGI certified?",
+          "a": "Yes, every diamond across our entire earring collection is IGI certified, guaranteeing cut, color, clarity, and carat weight to a globally recognized standard."
+        },
+        {
+          "q": "Solitaire, halo, other studs, or hoops — how do I choose?",
+          "a": "Solitaire studs offer clean, minimal sparkle for daily wear. Halo studs give a bigger, more radiant look for the same stone size. Other Studs suit anyone wanting a distinctive shape. Hoops and huggies are the most versatile, working equally well casually and dressed up."
+        },
+        {
+          "q": "Is the gold vermeil setting safe for everyday wear, including showers?",
+          "a": "Yes. Every earring is finished in 2.5-micron 24K gold vermeil, built to withstand daily wear and water exposure, so your diamonds can go wherever you go."
+        },
+        {
+          "q": "How do I take care of my earrings?",
+          "a": "Wipe with a soft cloth after each wear, store in a dry pouch away from sunlight, and avoid harsh chemicals like chlorine or strong perfumes applied directly to the piece."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Lab-Grown Diamond Earrings Online | House of Seya",
+        "intro": "House of Seya brings together every earring style — solitaire, halo, distinctive studs, hoops, and huggies — under one simple standard: every diamond is genuine, IGI certified, and set in richly plated 24K gold vermeil. Real diamonds you can verify, in designs built for real, everyday life.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Earrings?",
+            "body": "Lab-grown diamonds offer the exact same hardness, brilliance, and chemical structure as mined diamonds, at a meaningfully more accessible price, with a clean, conflict-free origin. Choosing House of Seya means choosing diamonds that are independently graded and documented, not just described in a product listing."
+          },
+          {
+            "title": "The House of Seya Collection: An Earring for Every Version of You",
+            "body": "Whether your everyday style leans minimal or you love a bit more sparkle, our earring collection is built to match. Solitaire and halo studs bring quiet or elevated brilliance close to the ear, Other Studs offer distinctive shapes for those who want personality, and hoops and huggies deliver versatile, all-day wearability — all finished in the same durable 2.5-micron 24K gold vermeil."
+          },
+          {
+            "title": "Shop Diamond Earrings Online in India",
+            "body": "Every earring ships with its diamond’s IGI certificate, arrives securely tracked, and is backed by 7-day returns and our Lifetime Buyback Program — buying fine diamond jewelry online, made as trustworthy as buying it in person."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our earring collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "Earrings Worth Gifting, Every Time",
+        "closing": "From a first diamond gift to a milestone celebration, our earring collection covers every occasion with pieces that combine genuine brilliance with full certification — a gift that's as easy to trust as it is to love.\n\nEvery House of Seya earring, across every style, is held to the same promise: certified diamonds, real gold vermeil, built for the life you actually live."
+      }
+    },
+    "pendants": {
+      "metaTitle": "Buy Diamond Pendants Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's diamond pendants special?",
+          "a": "Each pendant centers on a genuine, IGI-certified lab-grown diamond, designed to sit beautifully at the neckline whether worn alone or layered — real diamond, real documentation, in a design made for daily wear."
+        },
+        {
+          "q": "How can I be sure of the quality of the diamond in my pendant?",
+          "a": "Every pendant diamond is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you know exactly what you're wearing."
+        },
+        {
+          "q": "What chain length works best for a pendant?",
+          "a": "Shorter chains sit closer to the collarbone for a clean, everyday look, while longer chains give the pendant more presence and work well layered with other necklaces."
+        },
+        {
+          "q": "Is the gold vermeil chain and setting durable for daily wear?",
+          "a": "Yes. Both the pendant setting and the chain are finished in 2.5-micron 24K gold vermeil, built to handle daily wear and water exposure, including showers."
+        },
+        {
+          "q": "How should I maintain and care for my pendant?",
+          "a": "Store it flat or hanging separately to avoid tangling and scratching, wipe with a soft cloth after each wear, and avoid prolonged exposure to chlorine or harsh chemicals."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Pendants Online | House of Seya",
+        "intro": "A pendant is often the one piece of jewelry someone wears every single day — which is exactly why every House of Seya pendant is built around a genuine, IGI-certified lab-grown diamond you can trust completely, set on a chain made to match.",
+        "sections": [
+          {
+            "title": "Why Choose a Lab-Grown Diamond Pendant?",
+            "body": "A pendant sits close, visible, and constant — there's no hiding a weak stone here. That's why every diamond we use is independently certified for cut, color, clarity, and carat weight, giving you full documentation of the piece you'll be wearing daily."
+          },
+          {
+            "title": "The House of Seya Collection: One Diamond, Endless Versatility",
+            "body": "From delicate single-diamond pendants perfect for everyday minimalism to slightly bolder designs for evening wear, our pendant collection is built around real flexibility — wear it alone, layer it with a trinket necklace, or dress it up for an occasion. Every setting and chain is finished in 2.5-micron 24K gold vermeil."
+          },
+          {
+            "title": "Shop Diamond Pendants Online in India",
+            "body": "Every pendant diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — so a piece you’ll wear constantly still comes with full, lasting assurance."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our pendant collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "The Gift That Sits Closest to the Heart",
+        "closing": "A diamond pendant is one of the most enduringly meaningful gifts in fine jewelry — a piece worn close, every day, as a quiet reminder of the person who gave it. Backed by full certification, it's a gift with both sentimental and provable value.\n\nEvery House of Seya pendant carries the same standard: a certified diamond, a durable vermeil chain, made to be worn without a second thought."
+      }
+    },
+    "pendant-sets": {
+      "metaTitle": "Buy Diamond Pendant Sets Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What's included in a House of Seya pendant set?",
+          "a": "Our pendant sets pair a diamond pendant with matching earrings, so every diamond in the set shares the same cut, quality, and certification story — a coordinated look built around genuine, IGI-certified stones."
+        },
+        {
+          "q": "How can I be sure the diamond quality is consistent across the set?",
+          "a": "Every diamond in the set is individually IGI certified, so the pendant and earrings carry matching quality documentation, not just a matching design."
+        },
+        {
+          "q": "When should I wear a full set versus mixing pieces?",
+          "a": "Sets work beautifully for occasions where you want a considered, put-together look — weddings, celebrations, or gifting — while individual pieces from the set can just as easily be worn on their own day to day."
+        },
+        {
+          "q": "Is the gold vermeil consistent across the pendant and earrings?",
+          "a": "Yes, every piece in the set is finished in the same 2.5-micron 24K gold vermeil, so the tone and durability match exactly across your pendant and earrings."
+        },
+        {
+          "q": "How should I care for a full pendant set?",
+          "a": "Store each piece separately in its own pouch to prevent scratching between pieces, wipe with a soft cloth after wear, and avoid harsh chemicals or prolonged water exposure."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Pendant Sets Online | House of Seya",
+        "intro": "A pendant set takes the guesswork out of coordinating your diamonds — a matching pendant and earring pair, every stone IGI certified, every setting finished in the same richly plated 24K gold vermeil, so the whole look comes together effortlessly.",
+        "sections": [
+          {
+            "title": "Why Choose a Lab-Grown Diamond Pendant Set?",
+            "body": "Buying a set means every diamond you're wearing shares the same certified quality standard, cut consistency, and gold finish — no mismatched tones, no uncertainty about whether the pieces were really meant for each other. It's coordinated elegance, backed by matching documentation."
+          },
+          {
+            "title": "The House of Seya Collection: Considered, Coordinated, Certified",
+            "body": "Our pendant sets range from understated everyday pairings to more elevated designs suited to weddings and celebrations. Each set is designed so the individual pieces work just as well split apart for daily wear as they do worn together for an occasion — true versatility, without sacrificing cohesion."
+          },
+          {
+            "title": "Shop Diamond Pendant Sets Online in India",
+            "body": "Every diamond in the set ships with its own IGI certificate, the full set arrives securely tracked, and your purchase is backed by 7-day returns and our Lifetime Buyback Program — coordinated jewelry, with fully coordinated trust."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our pendant set collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Complete, Considered Gift",
+        "closing": "A matching pendant and earring set feels like a genuinely complete gift — thoughtful, coordinated, and unmistakably intentional. It's an easy way to make an occasion feel bigger, backed by certification on every single stone.\n\nEvery House of Seya pendant set is built to the same standard, piece for piece: certified diamonds, matching 24K vermeil, made to be worn together or apart."
+      }
+    },
+    "mangalsutra": {
+      "metaTitle": "Buy Diamond Mangalsutra Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's diamond mangalsutra special?",
+          "a": "Every mangalsutra pendant is set with a genuine, IGI-certified lab-grown diamond, honoring a deeply meaningful tradition with a modern, certified stone rather than an unverified one."
+        },
+        {
+          "q": "How can I be sure of the quality of the diamond in my mangalsutra?",
+          "a": "The diamond set into the mangalsutra pendant is IGI certified, with documented cut, color, clarity, and carat weight, giving you full transparency on a piece with such personal significance."
+        },
+        {
+          "q": "Can I choose between traditional and modern mangalsutra designs?",
+          "a": "Yes — our collection spans both classic black-bead styles and more contemporary, minimal designs, so you can choose a piece that honors tradition in the way that feels right for you."
+        },
+        {
+          "q": "Is the gold vermeil setting on the pendant durable for daily wear?",
+          "a": "Yes. The pendant setting is finished in 2.5-micron 24K gold vermeil, built to be worn daily without compromising the richness of the gold finish."
+        },
+        {
+          "q": "How should I maintain and care for my mangalsutra?",
+          "a": "Wipe the pendant gently with a soft cloth after wear, store it away from direct sunlight and other jewelry, and avoid harsh chemicals or prolonged water exposure on the beaded chain."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Mangalsutra Online | House of Seya",
+        "intro": "A mangalsutra carries meaning that goes far beyond its materials, and we approach it accordingly — every diamond set into a House of Seya mangalsutra is IGI certified, so a piece worn with such personal significance is never in question when it comes to quality.",
+        "sections": [
+          {
+            "title": "Why Choose a Lab-Grown Diamond Mangalsutra?",
+            "body": "A modern mangalsutra deserves modern standards — a certified, ethically sourced diamond, fully documented, worn daily as a symbol that deserves nothing less than complete transparency about what it’s made of."
+          },
+          {
+            "title": "The House of Seya Collection: Tradition, Made Contemporary",
+            "body": "Our mangalsutra collection spans classic black-bead designs rooted in tradition to more minimal, contemporary interpretations for those who want the symbolism without the heavier silhouette. Every pendant setting is finished in 2.5-micron 24K gold vermeil, built to be worn every day without losing its richness."
+          },
+          {
+            "title": "Shop Diamond Mangalsutra Online in India",
+            "body": "Every mangalsutra diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — because a piece this meaningful deserves complete peace of mind."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our mangalsutra collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Piece Meant to Be Treasured",
+        "closing": "A mangalsutra is rarely just a gift — it's a piece meant to be worn for a lifetime, carrying meaning well beyond its brilliance. Certified diamond quality ensures it holds up to that promise, materially as well as symbolically.\n\nEvery House of Seya mangalsutra combines genuine tradition with genuine documentation: a certified diamond, set to be worn and treasured for years."
+      }
+    },
+    "trinket-necklace": {
+      "metaTitle": "Buy Diamond Trinket Necklaces Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What is a trinket necklace, and what makes House of Seya's special?",
+          "a": "Trinket necklaces feature small, playful diamond charms designed for everyday layering — each one set with a genuine, IGI-certified lab-grown diamond, so even the smallest piece carries real, documented quality."
+        },
+        {
+          "q": "How can I be sure of the diamond quality in a trinket necklace?",
+          "a": "Every diamond, however small, is IGI certified, with cut, color, clarity, and carat weight documented — the same standard we apply across every piece in our collection."
+        },
+        {
+          "q": "How do I style a trinket necklace for layering?",
+          "a": "Trinket necklaces are designed to be layered — pair one with a slightly longer pendant necklace for dimension, or wear two or three together at different lengths for a personalized, collected look."
+        },
+        {
+          "q": "Is the gold vermeil chain durable enough for daily layering?",
+          "a": "Yes. Every trinket necklace is finished in 2.5-micron 24K gold vermeil, built to handle the daily wear that comes with layering multiple pieces."
+        },
+        {
+          "q": "How should I maintain and care for my trinket necklace?",
+          "a": "Store pieces separately to avoid chains tangling and scratching each other, wipe with a soft cloth after wear, and avoid harsh chemicals or prolonged water exposure."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Trinket Necklaces Online | House of Seya",
+        "intro": "Trinket necklaces prove that small doesn't mean lesser — every playful little charm in our collection is set with a genuine, IGI-certified lab-grown diamond, so even the most delicate piece carries real, fully documented quality.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Trinket Necklaces?",
+            "body": "Trinket necklaces are made for stacking and layering, which means they need to be as durable as they are delicate. Every diamond meets the same certification standard as our larger pieces, and every chain is built to withstand the daily wear that layering demands."
+          },
+          {
+            "title": "The House of Seya Collection: Made for Layering",
+            "body": "From single-charm minimalist chains to slightly more detailed trinket designs, this collection is built around versatility — mix, match, and layer freely, knowing every piece shares the same 2.5-micron 24K gold vermeil finish and certified diamond quality."
+          },
+          {
+            "title": "Shop Diamond Trinket Necklaces Online in India",
+            "body": "Every trinket necklace diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — small pieces, held to the same complete standard as everything else we make."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our trinket necklace collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "Playful, Personal, and Genuinely Certified",
+        "closing": "A trinket necklace makes for a wonderfully personal gift — light, wearable, and easy to layer into someone's everyday style, without sacrificing the certified diamond quality that makes it a genuinely meaningful gift.\n\nEvery House of Seya trinket necklace, however small, carries the same promise: a real diamond, honestly certified, built for everyday layering."
+      }
+    },
+    "all-necklaces": {
+      "metaTitle": "Buy Lab-Grown Diamond Necklaces Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's necklaces different from regular jewelry?",
+          "a": "Every necklace — pendant, set, mangalsutra, or trinket — features a genuine, IGI-certified lab-grown diamond, set in richly plated 24K gold vermeil, so every piece combines real brilliance with real documentation."
+        },
+        {
+          "q": "Are all your diamonds IGI certified?",
+          "a": "Yes, every diamond across our entire necklace collection is IGI certified, guaranteeing cut, color, clarity, and carat weight to a globally recognized standard."
+        },
+        {
+          "q": "Pendant, set, mangalsutra, or trinket — how do I choose?",
+          "a": "A pendant is the versatile everyday choice. Pendant sets suit occasions where you want a coordinated look. A mangalsutra carries personal, cultural significance. Trinket necklaces are made for playful, everyday layering."
+        },
+        {
+          "q": "Is the gold vermeil setting safe for everyday wear, including showers?",
+          "a": "Yes. Every necklace is finished in 2.5-micron 24K gold vermeil, built to withstand daily wear and water exposure."
+        },
+        {
+          "q": "How do I take care of my necklace?",
+          "a": "Store pieces separately to prevent tangling and scratching, wipe with a soft cloth after each wear, and avoid harsh chemicals or prolonged water exposure beyond normal daily wear."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Lab-Grown Diamond Necklaces Online | House of Seya",
+        "intro": "From everyday pendants to meaningful mangalsutras, House of Seya's necklace collection is built around one consistent promise: every diamond is genuine, IGI certified, and set in richly plated 24K gold vermeil, whatever style you choose.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Necklaces?",
+            "body": "A necklace sits close and stays visible all day, which makes certified quality essential, not optional. Every diamond across our necklace collection is independently graded and documented, so whatever piece you choose, you know exactly what you’re wearing."
+          },
+          {
+            "title": "The House of Seya Collection: A Necklace for Every Meaning",
+            "body": "Our necklace collection spans the everyday versatility of a diamond pendant, the coordinated elegance of a pendant set, the deep personal significance of a mangalsutra, and the playful layering of trinket necklaces — each finished in the same durable 2.5-micron 24K gold vermeil."
+          },
+          {
+            "title": "Shop Diamond Necklaces Online in India",
+            "body": "Every necklace diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — full trust, whichever necklace style speaks to you."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our necklace collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "Necklaces Worth Gifting, Whatever the Occasion",
+        "closing": "Whether it's an everyday pendant, a meaningful mangalsutra, or a considered pendant set, our necklace collection covers every gifting occasion with pieces backed by full diamond certification — genuinely beautiful, and genuinely provable.\n\nEvery House of Seya necklace, across every style, carries the same standard: certified diamonds, real gold vermeil, made to be worn and trusted."
+      }
+    },
+    "tennis-bracelet": {
+      "metaTitle": "Buy Diamond Tennis Bracelets Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What is a diamond tennis bracelet, and what makes House of Seya's special?",
+          "a": "A tennis bracelet is a continuous line of diamonds set edge to edge — every stone in ours is a genuine, IGI-certified lab-grown diamond, so the brilliance running the length of the bracelet is fully documented, not just described."
+        },
+        {
+          "q": "How can I be sure of the quality of every diamond in the bracelet?",
+          "a": "Each diamond is individually graded to a consistent standard, with the bracelet's overall quality backed by IGI certification covering cut, color, clarity, and carat weight across the piece."
+        },
+        {
+          "q": "How do I choose the right size for a tennis bracelet?",
+          "a": "A tennis bracelet should sit comfortably at the wrist with a little give — not so loose that it swings around, not so tight that it digs in. We recommend measuring your wrist and adding a small amount of ease for the most comfortable fit."
+        },
+        {
+          "q": "Is the gold vermeil setting and clasp durable enough for daily wear?",
+          "a": "Yes. Every link and clasp is finished in 2.5-micron 24K gold vermeil, built to withstand daily wear and water exposure, including showers."
+        },
+        {
+          "q": "How should I maintain and care for my tennis bracelet?",
+          "a": "Wipe gently with a soft cloth after each wear, store flat in a dry pouch to avoid tangling, and avoid harsh chemicals, chlorine, or prolonged water exposure beyond normal daily wear."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Tennis Bracelets Online | House of Seya",
+        "intro": "A tennis bracelet is one of the most demanding pieces of jewelry to get right — every diamond along the line has to match in quality as well as design. House of Seya holds every stone to the same IGI-certified standard, so the brilliance running your wrist is consistent from end to end.",
+        "sections": [
+          {
+            "title": "Why Choose a Lab-Grown Diamond Tennis Bracelet?",
+            "body": "With dozens of individual stones in a single piece, certified consistency matters more here than almost anywhere else in fine jewelry. Choosing lab-grown diamonds means every stone shares the same hardness, brilliance, and documented quality, at a price that makes this once-rare statement piece genuinely attainable."
+          },
+          {
+            "title": "The House of Seya Collection: Continuous Brilliance, Built to Last",
+            "body": "Our tennis bracelets range from more delicate, everyday-friendly designs to fuller, more dramatic lines of diamonds for those who want their bracelet to lead. Every link and clasp is finished in 2.5-micron 24K gold vermeil, giving the piece the strength to handle daily wear without compromising its shine."
+          },
+          {
+            "title": "Shop Diamond Tennis Bracelets Online in India",
+            "body": "Every diamond in your tennis bracelet ships with certification, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — a statement piece, bought with full confidence."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our tennis bracelet collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "A Statement Gift, Fully Certified",
+        "closing": "A tennis bracelet has long been considered a milestone gift — the kind of piece given to mark something significant. With every diamond individually certified, it's a gift whose value is provable, not just beautiful.\n\nEvery House of Seya tennis bracelet is held to the same promise, stone by stone: certified diamonds, durable 24K vermeil, made to be worn with confidence."
+      }
+    },
+    "station-bracelet": {
+      "metaTitle": "Buy Diamond Chain Bracelets Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's diamond chain bracelets special?",
+          "a": "Each chain bracelet features a genuine, IGI-certified lab-grown diamond charm or accent set along the chain, combining everyday wearability with real, documented diamond quality."
+        },
+        {
+          "q": "How can I be sure of the diamond quality in a chain bracelet?",
+          "a": "Every diamond used is IGI certified, with cut, color, clarity, and carat weight documented, regardless of how small or subtle the accent is."
+        },
+        {
+          "q": "Can I stack multiple chain bracelets together?",
+          "a": "Yes — chain bracelets are designed to be layered. Mix varying chain thicknesses and charm placements for a personalized, collected look on the wrist."
+        },
+        {
+          "q": "Is the gold vermeil chain durable enough for daily stacking?",
+          "a": "Yes. Every chain bracelet is finished in 2.5-micron 24K gold vermeil, built to handle the daily wear that comes with stacking multiple pieces."
+        },
+        {
+          "q": "How should I maintain and care for my chain bracelet?",
+          "a": "Store pieces separately to prevent chains tangling and scratching each other, wipe with a soft cloth after wear, and avoid harsh chemicals or prolonged water exposure."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Diamond Chain Bracelets Online | House of Seya",
+        "intro": "Chain bracelets are designed for stacking, which means every piece needs to hold up to daily layering without losing its shine — and every diamond accent needs to be exactly what it claims to be. Every stone we use is IGI certified, however subtle the accent.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Chain Bracelets?",
+            "body": "A chain bracelet is often the entry point into daily diamond jewelry — light, versatile, easy to layer. Choosing lab-grown diamonds here means getting genuine sparkle and hardness at a price that makes stacking multiple pieces a realistic, guilt-free choice."
+          },
+          {
+            "title": "The House of Seya Collection: Built to Stack",
+            "body": "From delicate single-charm chains to slightly bolder link designs, our chain bracelet collection is made for mixing and layering. Every chain is finished in 2.5-micron 24K gold vermeil, giving each piece the durability to handle daily stacking without tangling or dulling."
+          },
+          {
+            "title": "Shop Diamond Chain Bracelets Online in India",
+            "body": "Every diamond accent ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — everyday jewelry, held to a fine-jewelry standard of trust."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our chain bracelet collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "An Easy, Everyday Gift",
+        "closing": "A chain bracelet makes for an effortless, wearable gift — light enough for daily rotation, meaningful enough thanks to its certified diamond accent. It's an easy way to introduce someone to fine jewelry they'll actually reach for every day.\n\nEvery House of Seya chain bracelet shares the same foundation: certified diamonds, durable 24K vermeil, made for a lifetime of layering."
+      }
+    },
+    "all-bracelets": {
+      "metaTitle": "Buy Lab-Grown Diamond Bracelets Online | House of Seya",
+      "faqs": [
+        {
+          "q": "What makes House of Seya's bracelets different from regular jewelry?",
+          "a": "Every bracelet — tennis or chain — features genuine, IGI-certified lab-grown diamonds, set in richly plated 24K gold vermeil, so every piece combines real brilliance with real documentation."
+        },
+        {
+          "q": "Are all your diamonds IGI certified?",
+          "a": "Yes, every diamond across our entire bracelet collection is IGI certified, guaranteeing cut, color, clarity, and carat weight to a globally recognized standard."
+        },
+        {
+          "q": "Tennis or chain — how do I choose?",
+          "a": "A tennis bracelet delivers continuous, statement-level sparkle for someone who wants their diamonds to lead. A chain bracelet offers understated, stackable everyday wear with diamond accents woven in."
+        },
+        {
+          "q": "Is the gold vermeil setting safe for everyday wear, including showers?",
+          "a": "Yes. Every bracelet is finished in 2.5-micron 24K gold vermeil, built to withstand daily wear and water exposure."
+        },
+        {
+          "q": "How do I take care of my bracelet?",
+          "a": "Store pieces separately to prevent tangling and scratching, wipe with a soft cloth after each wear, and avoid harsh chemicals or prolonged water exposure beyond normal daily wear."
+        }
+      ],
+      "seo": {
+        "heading": "Buy Lab-Grown Diamond Bracelets Online | House of Seya",
+        "intro": "From statement tennis bracelets to everyday stackable chains, House of Seya's bracelet collection is built on one consistent standard: every diamond is genuine, IGI certified, and set in richly plated 24K gold vermeil, whichever style fits your wrist.",
+        "sections": [
+          {
+            "title": "Why Choose Lab-Grown Diamond Bracelets?",
+            "body": "Bracelets see more daily movement and wear than almost any other jewelry category, which makes both durability and certified quality essential. Every diamond across our bracelet collection is independently graded and documented, so whatever you choose, you know exactly what you’re wearing."
+          },
+          {
+            "title": "The House of Seya Collection: From Statement to Stackable",
+            "body": "Our bracelet collection spans the continuous brilliance of a tennis bracelet to the light, layerable versatility of a chain bracelet — every link and clasp finished in the same durable 2.5-micron 24K gold vermeil, built for the way you actually move through your day."
+          },
+          {
+            "title": "Shop Diamond Bracelets Online in India",
+            "body": "Every bracelet diamond ships with its IGI certificate, every order arrives securely tracked, and every purchase is backed by 7-day returns and our Lifetime Buyback Program — full trust, whichever bracelet style you choose."
+          }
+        ],
+        "whyUs": [
+          {
+            "title": "Certified Quality.",
+            "body": "Every diamond in our bracelet collection is IGI certified, with cut, color, clarity, and carat weight independently graded and documented, so you always know exactly what you're wearing."
+          },
+          {
+            "title": "24K Gold Vermeil Craftsmanship.",
+            "body": "Each setting is finished in 2.5-micron 24K gold vermeil over a BIS hallmarked sterling silver base — the genuine, legally recognized minimum for vermeil, a bar a lot of jewelry marketed as 'vermeil' doesn't actually meet, often plating closer to 0.5 microns instead."
+          },
+          {
+            "title": "Trust & Transparency.",
+            "body": "Every order ships securely with tracking, backed by 7-day returns and exchanges and a Lifetime Buyback Program, so your purchase is protected well beyond the day it arrives."
+          }
+        ],
+        "closingTitle": "Bracelets Worth Gifting, Whatever the Occasion",
+        "closing": "Whether it's a statement tennis bracelet for a milestone or an easy chain bracelet for everyday wear, our bracelet collection covers every gifting occasion with pieces backed by full diamond certification — genuinely beautiful, and genuinely provable.\n\nEvery House of Seya bracelet, across every style, carries the same standard: certified diamonds, real gold vermeil, made to be worn and trusted."
+      }
+    }
+  },
+  "heroSlides": [
+    {
+      "id": 1,
+      "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGRpYW1vbmQlMjBuZWNrbGFjZXxlbnwwfHx8fDE3ODQ5MTI1MTh8MA&ixlib=rb-4.1.0&q=85&w=2000",
+      "tagline": "The Autumn Edit",
+      "title": "A New Language of Luxury",
+      "cta": "Explore",
+      "href": "/collections/new-collection"
+    },
+    {
+      "id": 2,
+      "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjBkaWFtb25kJTIwamV3ZWxsZXJ5fGVufDB8fHx8MTc4NDkxMjQ2NXww&ixlib=rb-4.1.0&q=85&w=2000",
+      "tagline": "Gold Reimagined",
+      "title": "Same gold. New feeling.",
+      "cta": "Recycle Your Gold",
+      "href": "/pages/gold-reimagined"
+    },
+    {
+      "id": 3,
+      "image": "https://images.pexels.com/photos/36599395/pexels-photo-36599395.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=2000",
+      "tagline": "Follow The Feeling",
+      "title": "Diamonds Made To Move With You",
+      "cta": "Explore The Edit",
+      "href": "/collections/follow-the-feeling"
+    },
+    {
+      "id": 4,
+      "image": "https://images.unsplash.com/photo-1763628212781-7d52844cf358?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGVhcnJpbmdzfGVufDB8fHx8MTc4NDkxMjUyNHww&ixlib=rb-4.1.0&q=85&w=2000",
+      "tagline": "New Arrivals",
+      "title": "New Feelings, New Pieces",
+      "cta": "Explore",
+      "href": "/collections/new-collection"
+    }
+  ],
+  "heroTiles": [
+    {
+      "title": "Crafted by us,\nDesigned by you",
+      "cta": "Customise",
+      "image": "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?crop=entropy&cs=srgb&fm=jpg&w=1400&q=85",
+      "href": "/pages/customise"
+    },
+    {
+      "title": "Follow The Feeling",
+      "cta": "About us",
+      "image": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=1400",
+      "href": "/about"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "Round",
+      "img": "https://houseofquadri.com/cdn/shop/files/01.webp?width=200"
+    },
+    {
+      "name": "Oval",
+      "img": "https://houseofquadri.com/cdn/shop/files/02.webp?width=200"
+    },
+    {
+      "name": "Princess",
+      "img": "https://houseofquadri.com/cdn/shop/files/03.webp?width=200"
+    },
+    {
+      "name": "Emerald",
+      "img": "https://houseofquadri.com/cdn/shop/files/04.webp?width=200"
+    },
+    {
+      "name": "Radiant",
+      "img": "https://houseofquadri.com/cdn/shop/files/05.webp?width=200"
+    },
+    {
+      "name": "Heart",
+      "img": "https://houseofquadri.com/cdn/shop/files/07.webp?width=200"
+    },
+    {
+      "name": "Cushion",
+      "img": "https://houseofquadri.com/cdn/shop/files/cushion_60d5ebd6-5556-4203-970d-c4e3d87cc7cb.png?width=200"
+    },
+    {
+      "name": "Pear",
+      "img": "https://houseofquadri.com/cdn/shop/files/06.webp?width=200"
+    },
+    {
+      "name": "Marquise",
+      "img": "https://houseofquadri.com/cdn/shop/files/09.webp?width=200"
+    },
+    {
+      "name": "Asscher",
+      "img": "https://houseofquadri.com/cdn/shop/files/asscher.webp?width=200"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Priya",
+      "location": "London",
+      "quote": "I ordered from the UK and I honestly can't thank the HouseOfSeya team enough. From the very beginning, the whole experience felt personal and truly special.",
+      "img": "https://images.unsplash.com/photo-1541679368093-5c967ac6de11?crop=entropy&cs=srgb&fm=jpg&w=800&q=85",
+      "rating": 5,
+      "product": "Solitaire Studs",
+      "verified": true,
+      "date": "2026-06-14"
+    },
+    {
+      "name": "Shivani & Jason",
+      "location": "Mumbai",
+      "quote": "Working with HouseOfSeya was seamless! Got my personalised piece done, and it came out beautiful. Thank you!",
+      "img": "https://images.unsplash.com/photo-1540076156429-35ffe82b7870?crop=entropy&cs=srgb&fm=jpg&w=800&q=85",
+      "rating": 5,
+      "product": "Custom Order",
+      "verified": true,
+      "date": "2026-05-02"
+    },
+    {
+      "name": "Rashi",
+      "location": "London",
+      "quote": "Great experience! I bought a piece from HouseOfSeya, and it was perfect. I would 100% recommend if you are looking for diamond jewellery.",
+      "img": "https://images.unsplash.com/photo-1631897817977-a1005c199b36?crop=entropy&cs=srgb&fm=jpg&w=800&q=85",
+      "rating": 5,
+      "product": "Hoops & Huggies",
+      "verified": true,
+      "date": "2026-04-21"
+    },
+    {
+      "name": "Divian",
+      "location": "Delhi",
+      "quote": "The experience with HouseOfSeya was simply amazing. The team was incredibly helpful, genuine and informative. It came out beautiful, exactly how I wanted it.",
+      "img": "https://images.pexels.com/photos/30720972/pexels-photo-30720972.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "rating": 5,
+      "product": "Custom Order",
+      "verified": true,
+      "date": "2026-03-11"
+    },
+    {
+      "name": "Ravi",
+      "location": "USA",
+      "quote": "They were able to beautifully turn a design into life making sure I was comfortable with every detail. 10/10 experience!",
+      "img": "https://images.pexels.com/photos/10075092/pexels-photo-10075092.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "rating": 5,
+      "product": "Custom Order",
+      "verified": true,
+      "date": "2026-02-27"
+    },
+    {
+      "name": "Meera",
+      "location": "Bengaluru",
+      "quote": "Stunning craftsmanship and the customer service was top notch. The studs are exactly what I wanted for everyday wear.",
+      "img": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?crop=entropy&cs=srgb&fm=jpg&w=800&q=85",
+      "rating": 4,
+      "product": "Other Studs",
+      "verified": true,
+      "date": "2026-01-30"
+    }
+  ],
+  "promises": [
+    "IGI Certified Diamonds",
+    "24K Gold Vermeil",
+    "Secure Shipping",
+    "Lifetime Buyback",
+    "7-Day Easy Returns",
+    "BIS Hallmarked Silver Base"
+  ],
+  "press": [
+    "Vogue",
+    "ELLE",
+    "Grazia",
+    "Femina",
+    "Financial Express",
+    "The Hindu",
+    "News18",
+    "Republic",
+    "Mid-day",
+    "The Style List",
+    "Wedding Vows",
+    "Khush"
+  ],
+  "faqs": [
+    {
+      "group": "The Diamond, First",
+      "q": "What are lab-grown diamonds?",
+      "a": "Lab-grown diamonds are real diamonds, created using the same carbon-crystallization process that forms diamonds underground, replicated in a controlled lab environment instead of over billions of years. They are chemically, physically, and optically identical to mined diamonds — same hardness, same brilliance, same sparkle. Every House of Seya diamond comes with IGI certification."
+    },
+    {
+      "group": "The Diamond, First",
+      "q": "Are lab-grown diamonds real diamonds?",
+      "a": "Yes. A lab-grown diamond is exactly like a natural diamond in every way that matters, except instead of being mined from the earth, it's grown in a lab. It sparkles the same, comes in the same colors and clarities, and offers the same permanence — at a fraction of the price of an equivalent mined stone."
+    },
+    {
+      "group": "The Diamond, First",
+      "q": "Can anyone tell the difference between a lab-grown and a mined diamond?",
+      "a": "No. Lab-grown diamonds share the same physical, chemical, and optical properties as natural diamonds. Even trained jewelers cannot tell them apart without specialized gemological equipment."
+    },
+    {
+      "group": "The Diamond, First",
+      "q": "Are House of Seya's diamonds IGI certified?",
+      "a": "Yes. Every diamond we set is IGI (International Gemological Institute) certified, guaranteeing cut, color, clarity, and carat weight to a globally recognized standard."
+    },
+    {
+      "group": "The Diamond, First",
+      "q": "Do lab-grown diamonds lose their shine over time?",
+      "a": "No. With a hardness of 10 on the Mohs scale, our diamonds retain their brilliance and clarity permanently, making them ideal for daily wear as well as pieces you'll treasure for years."
+    },
+    {
+      "group": "The Diamond, First",
+      "q": "Why choose lab-grown diamonds over mined diamonds?",
+      "a": "Three reasons our customers choose lab-grown: a clean, conflict-free, traceable origin; the exact same brilliance, hardness, and durability as mined diamonds; and meaningfully better value, letting you invest in a larger stone or a more intricate design without compromising your budget."
+    },
+    {
+      "group": "The Setting: 24K Gold Vermeil",
+      "q": "What is gold vermeil, and how is it different from gold plating?",
+      "a": "Gold vermeil is a real, regulated jewelry standard — a rich layer of genuine gold bonded over a sterling silver base, at least 2.5 microns thick. Ordinary \"gold plated\" jewelry has no such minimum and is often closer to 0.5 microns, which fades within weeks. Vermeil, done properly, is built to hold its richness and durability for years."
+    },
+    {
+      "group": "The Setting: 24K Gold Vermeil",
+      "q": "How thick is House of Seya's gold vermeil, and why does that matter?",
+      "a": "Our diamonds are set in 24K gold vermeil, plated at 2.5 microns — the legal international minimum for a piece to genuinely be called vermeil at all. A lot of jewelry marketed as vermeil is actually plated well below this, often around 0.5 microns, which legally only qualifies as gold plating. This means the setting around your diamond is held to a real, defensible standard, built for daily life, not just special occasions."
+    },
+    {
+      "group": "The Setting: 24K Gold Vermeil",
+      "q": "Can I wear House of Seya jewelry in the shower or every day?",
+      "a": "Yes. Our 2.5-micron gold vermeil is built to handle daily wear and water exposure, so your diamonds can go wherever you go, shower included."
+    },
+    {
+      "group": "The Setting: 24K Gold Vermeil",
+      "q": "Why is gold vermeil more affordable than a solid gold diamond setting?",
+      "a": "Because vermeil uses a metal base beneath the gold layer rather than gold throughout, it lets us put more of your budget toward the diamond itself — a genuine, certified stone — rather than the setting material."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "What is your return, exchange, and buyback policy?",
+      "a": "We offer 7-day returns and exchanges, along with a Lifetime Buyback Program on eligible pieces, so you can shop with confidence today and know your jewelry continues to hold value well beyond your purchase."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "Is shipping secure?",
+      "a": "Yes, every order is securely packaged and shipped with tracking, so you always know where your piece is on its way to you."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "How do I care for my House of Seya jewelry?",
+      "a": "Store pieces in a dry, airtight pouch away from direct sunlight. Apply makeup, perfume, and hairspray before putting your jewelry on, not after. Wipe gently with a soft cloth after each wear to keep your diamond and its setting looking their brilliant best."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "Is House of Seya jewelry a good gifting option?",
+      "a": "Yes — you're gifting an IGI-certified diamond in a richly plated 24K gold vermeil setting, backed by our buyback and returns policies, at a price point that makes fine diamond jewelry gifting more accessible without feeling any less special."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "What is the base metal beneath the gold vermeil?",
+      "a": "Our gold vermeil is set over a BIS hallmarked sterling silver base, certified to the purity standard set by India's Bureau of Indian Standards — giving every piece a solid, certified foundation beneath its 24K gold finish."
+    },
+    {
+      "group": "Buying With Confidence",
+      "q": "How do I know I'm buying a genuine, certified diamond?",
+      "a": "Every diamond ships with its own IGI certificate, independently verifying its cut, color, clarity, and carat weight. You're not just taking our word for it — you have the documentation to prove exactly what you own."
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Earrings",
+      "href": "/collections/earrings",
+      "sub": [
+        {
+          "label": "Solitaire Studs",
+          "href": "/collections/earrings/solitaire-studs"
+        },
+        {
+          "label": "Hoops & Huggies",
+          "href": "/collections/earrings/hoops-huggies"
+        },
+        {
+          "label": "Other Studs",
+          "href": "/collections/earrings/other-studs"
+        },
+        {
+          "label": "Halo Studs",
+          "href": "/collections/earrings/halo-studs"
+        },
+        {
+          "label": "All Earrings",
+          "href": "/collections/earrings"
+        }
+      ]
+    },
+    {
+      "label": "Necklaces",
+      "href": "/collections/necklaces",
+      "sub": [
+        {
+          "label": "Pendants",
+          "href": "/collections/necklaces/pendants"
+        },
+        {
+          "label": "Pendant Sets",
+          "href": "/collections/necklaces/pendant-sets"
+        },
+        {
+          "label": "Mangalsutra",
+          "href": "/collections/necklaces/mangalsutra"
+        },
+        {
+          "label": "Trinket Necklace",
+          "href": "/collections/necklaces/trinket-necklace"
+        },
+        {
+          "label": "All Necklaces",
+          "href": "/collections/necklaces"
+        }
+      ]
+    },
+    {
+      "label": "Bracelets",
+      "href": "/collections/bracelets",
+      "sub": [
+        {
+          "label": "Tennis Bracelet",
+          "href": "/collections/bracelets/tennis-bracelet"
+        },
+        {
+          "label": "Station Bracelet",
+          "href": "/collections/bracelets/station-bracelet"
+        },
+        {
+          "label": "All Bracelets",
+          "href": "/collections/bracelets"
+        }
+      ]
+    },
+    {
+      "label": "Services",
+      "href": "/services/gifting",
+      "sub": [
+        {
+          "label": "Gifting",
+          "href": "/services/gifting"
+        },
+        {
+          "label": "Customise",
+          "href": "/services/customise"
+        }
+      ]
+    },
+    {
+      "label": "Jewellery Guide",
+      "href": "/pages/diamond-education",
+      "sub": [
+        {
+          "label": "Diamond Education",
+          "href": "/pages/diamond-education"
+        },
+        {
+          "label": "Gold Vermeil",
+          "href": "/pages/gold-vermeil"
+        },
+        {
+          "label": "FAQ's",
+          "href": "/faqs"
+        },
+        {
+          "label": "Blogs",
+          "href": "/blogs"
+        }
+      ]
+    }
+  ],
+  "blogs": [
+    {
+      "slug": "solitaire-studs-everyday-guide",
+      "category": "earrings",
+      "title": "The Solitaire Stud: A Guide to Everyday Sparkle",
+      "excerpt": "Why a single, brilliant diamond is the most versatile piece in your jewellery box.",
+      "image": "https://images.unsplash.com/photo-1693212793204-bcea856c75fe?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "body": "A solitaire stud features a single, brilliant lab-grown diamond as the centerpiece — clean, timeless, and endlessly wearable. Every House of Seya solitaire diamond is IGI certified, so the brilliance you see is backed by independent, verifiable documentation."
+    },
+    {
+      "slug": "hoops-huggies-styling",
+      "category": "earrings",
+      "title": "Hoops vs. Huggies: Which Earring Style Fits Your Day?",
+      "excerpt": "From close-to-the-lobe huggies to statement hoops — how to pick your everyday go-to.",
+      "image": "https://images.pexels.com/photos/5370644/pexels-photo-5370644.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "body": "Huggies sit close to the earlobe, ideal for all-day, low-profile wear. Larger hoops make more of a statement and are great for adding instant polish to a simple outfit. Both are finished in 24K gold vermeil, built for daily wear."
+    },
+    {
+      "slug": "pendant-layering-guide",
+      "category": "necklaces",
+      "title": "The Art of Layering: Pendants & Trinket Necklaces",
+      "excerpt": "How to stack a diamond pendant with trinket necklaces for a considered, collected look.",
+      "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "body": "A pendant is often the one piece of jewellery someone wears every single day. Pair a shorter trinket chain with a longer pendant necklace for dimension, or wear two or three together at different lengths for a personalized look."
+    },
+    {
+      "slug": "mangalsutra-modern-tradition",
+      "category": "necklaces",
+      "title": "Mangalsutra, Made Modern",
+      "excerpt": "Honouring tradition with a certified lab-grown diamond, in a design built for daily life.",
+      "image": "https://images.pexels.com/photos/20838859/pexels-photo-20838859.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "body": "A modern mangalsutra deserves modern standards — a certified, ethically sourced diamond, fully documented, worn daily as a symbol that deserves nothing less than complete transparency about what it is made of."
+    },
+    {
+      "slug": "tennis-bracelet-guide",
+      "category": "bracelets",
+      "title": "The Tennis Bracelet: A House of Seya Staple",
+      "excerpt": "A line of brilliant lab-grown diamonds, built to be worn every single day.",
+      "image": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=900",
+      "body": "The tennis bracelet is one of the most enduring silhouettes in fine jewellery — a continuous line of diamonds set in 24K gold vermeil over a BIS hallmarked sterling silver base, built for daily wear."
+    },
+    {
+      "slug": "gold-vermeil-vs-plated",
+      "category": null,
+      "title": "Gold Vermeil vs. Gold Plated: What the Label Actually Means",
+      "excerpt": "The 2.5-micron standard that separates real vermeil from ordinary gold plating.",
+      "image": "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "body": "Gold vermeil is a real, regulated jewelry standard — a rich layer of genuine gold bonded over a sterling silver base, at least 2.5 microns thick. Ordinary \"gold plated\" jewelry has no such minimum and is often closer to 0.5 microns, which fades within weeks."
+    },
+    {
+      "slug": "jewelry-not-an-investment",
+      "category": "Jewelry Guide",
+      "title": "Stop Treating Your Jewelry Like an Investment — Here's What to Do Instead",
+      "excerpt": "For generations, Indian buyers have been taught to treat jewelry as an investment. Here's why that idea deserves a rethink — and how to actually protect your money while still wearing what you love.",
+      "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+      "body": "For as long as most of us can remember, jewelry in India has carried a second job. It isn't just something you wear — it's something you're supposed to hold onto, protect, and eventually, if the story goes as planned, sell back for a profit.",
+      "sections": [
+        {
+          "type": "paragraph",
+          "text": "For as long as most of us can remember, jewelry in India has carried a second job. It isn't just something you wear — it's something you're supposed to hold onto, protect, and eventually, if the story goes as planned, sell back for a profit. Ask most Indian households why they bought a particular gold or diamond piece, and somewhere in the answer you'll hear the word “investment.”"
+        },
+        {
+          "type": "paragraph",
+          "text": "It's such a familiar idea that we rarely stop to question it. But it's worth asking: is jewelry actually a good investment? And more importantly — is treating it like one costing you the thing jewelry was supposed to give you in the first place?"
+        },
+        {
+          "type": "heading",
+          "text": "Where the “Investment” Idea Comes From"
+        },
+        {
+          "type": "paragraph",
+          "text": "The instinct isn't irrational. For generations, gold was one of the few assets Indian households could reliably access, understand, and trust — especially at a time when formal investment options were limited, and gold jewelry doubled as both adornment and a store of value passed down through families. Buying jewelry wasn't just a purchase; it was financial planning, wrapped in something beautiful enough to wear to a wedding."
+        },
+        {
+          "type": "paragraph",
+          "text": "That instinct made sense in a different economic era. But holding onto it today, largely unquestioned, means a lot of jewelry — including pieces people genuinely love — ends up spending most of its life in a locker instead of on the person it was bought for."
+        },
+        {
+          "type": "heading",
+          "text": "The Real Cost of Treating Jewelry as an Investment"
+        },
+        {
+          "type": "paragraph",
+          "text": "Here's what rarely gets talked about: jewelry is actually a poor investment vehicle, once you account for the full picture."
+        },
+        {
+          "type": "paragraph",
+          "boldText": "Making charges and margins rarely come back to you.",
+          "text": " When you buy a piece, you're paying for the metal, the diamond or stone, and the craftsmanship that shaped it. When you sell it back, most buyers only offer you the raw material value — the gold weight, or a fraction of the diamond's worth — not what you actually paid. That gap is money that simply disappears."
+        },
+        {
+          "type": "paragraph",
+          "boldText": "It sits idle, which is the opposite of what an investment should do.",
+          "text": " A stock, a bond, a gold ETF — these are built to be held precisely so they can grow quietly in the background while you go about your life. Jewelry can't do that. A piece sitting in a locker isn't earning anything; it's just sitting there, often insured, sometimes forgotten, doing nothing for you financially or otherwise."
+        },
+        {
+          "type": "paragraph",
+          "boldText": "And the emotional cost is real too.",
+          "text": " Jewelry chosen for how it makes you feel — a gift, a milestone piece, something you saved up for — deserves to be worn, not treated like a financial instrument you're afraid to touch. Ask anyone who's kept a beloved piece locked away “for its value” how often they actually got to enjoy it. Usually, the honest answer is: barely at all."
+        },
+        {
+          "type": "heading",
+          "text": "Separate the Investment From the Jewelry"
+        },
+        {
+          "type": "paragraph",
+          "text": "Here's the shift worth making: stop asking your jewelry to be your investment plan, and let it just be jewelry."
+        },
+        {
+          "type": "paragraph",
+          "text": "If building financial security through gold matters to you — and it's a completely reasonable goal — there are instruments built specifically for that purpose: Sovereign Gold Bonds, gold ETFs, or digital gold, all of which track gold's value transparently, without the markup of craftsmanship or the illiquidity of a physical piece. These are designed to be sold, tracked, and grown as actual financial assets."
+        },
+        {
+          "type": "paragraph",
+          "text": "Once your investment goals are handled separately, something freeing happens: your jewelry no longer has to justify its existence financially. You're free to choose pieces because you genuinely love them, wear them because they make you feel like yourself, and never have to weigh “how much is this worth if I need to sell it” against “how much do I love wearing this.”"
+        },
+        {
+          "type": "paragraph",
+          "text": "That's precisely the gap House of Seya was built to sit in. When a diamond doesn't carry the enormous premium of a mined stone, and gold vermeil delivers real richness without the price of solid gold throughout, jewelry stops needing to double as a safety net. It can just be what it was always meant to be — something you choose because it's beautiful, and wear because you love it, not because you're protecting a future resale value."
+        },
+        {
+          "type": "heading",
+          "text": "You Shouldn't Have to Give Up a Piece to Get Its Value"
+        },
+        {
+          "type": "paragraph",
+          "text": "The other part of the old model that deserves rethinking: the idea that the only way to ever “realize” value from a piece is to give it up entirely — melt it down, sell it back for a fraction of what you paid, and lose it forever."
+        },
+        {
+          "type": "paragraph",
+          "text": "That's part of why we built our Lifetime Buyback Program the way we did. It exists as a safety net for the pieces you no longer wear, not as the reason you bought them in the first place. Your jewelry doesn't have to earn its keep by sitting untouched — you can wear it constantly, love it fully, and know that if your taste changes down the line, there's still a path to real value without having started from a place of financial anxiety about a piece you were supposed to be enjoying."
+        },
+        {
+          "type": "heading",
+          "text": "Wear It. That Was the Whole Point."
+        },
+        {
+          "type": "paragraph",
+          "text": "Jewelry was never meant to be a locker's most frequent visitor. It was meant to catch the light at dinner, sit at your collarbone on an ordinary Tuesday, and make you feel a little more like yourself every time you put it on."
+        },
+        {
+          "type": "paragraph",
+          "text": "Put your investment goals where they belong — in instruments built for growth. And put your jewelry where it belongs too: on you."
+        }
+      ]
+    }
+  ],
+  "whatsappNumber": "918722447768",
+  "diamondSectionVideo": "https://cdn.coverr.co/videos/coverr-close-up-of-a-diamond-ring-2633/1080p.mp4",
+  "pages": {
+    "about": {
+      "hero": {
+        "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?crop=entropy&cs=srgb&fm=jpg&w=2000&q=85",
+        "tagline": "Our Story",
+        "title": "Follow the Feeling"
+      },
+      "intro": {
+        "title": "Follow the Feeling",
+        "body": "House of Seya was built on a simple instinct: jewellery should feel like an extension of you, not an occasion you wait for. We design pieces for the everyday — the ones you reach for without thinking twice, and the ones that quietly mark the moments that matter."
+      },
+      "philosophy": {
+        "tagline": "Because it Feels Right",
+        "title": "Diamonds that don’t cost the Earth",
+        "body": "Every House of Seya diamond is lab-grown — chemically, physically, and optically identical to a mined diamond, IGI certified, and priced with a lot more sense. Kinder to the planet, and kinder to you.",
+        "image": "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?crop=entropy&cs=srgb&fm=jpg&w=1200&q=85"
+      },
+      "everyday": {
+        "tagline": "Today > Someday",
+        "title": "Jewellery for now, not just for someday",
+        "body": "We don't believe fine jewellery should sit in a box waiting for a special occasion. Our pieces are made to be worn daily — layered, stacked, and lived in — so the moments that matter are the ones you're already having.",
+        "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&w=1200&q=85"
+      },
+      "founder": {
+        "tagline": "Homegrown in India",
+        "name": "Seya Kapoor",
+        "title": "Founder, House of Seya",
+        "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=srgb&fm=jpg&w=800&q=85",
+        "body": "House of Seya began in 2021 out of a frustration with an industry that made fine jewellery feel distant and transactional. Starting with a single collection of lab-grown diamond studs, the brand has grown into a full house of everyday and celebration pieces — still designed, sourced, and shipped from India, with the same intention it started with."
+      },
+      "experience": {
+        "tagline": "The House of Seya Experience",
+        "title": "Jewellery shopping, made personal",
+        "body": "From your first message to us to the moment your piece arrives, every House of Seya order is looked after by a real person — not a queue. Need help choosing a gift, customising a piece, or sizing a ring? We’re a message away.",
+        "image": "https://images.pexels.com/photos/10976654/pexels-photo-10976654.jpeg?auto=compress&cs=tinysrgb&w=1200"
+      }
+    },
+    "diamondEducation": {
+      "hero": {
+        "title": "The Complete Diamond Guide",
+        "image": "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?crop=entropy&cs=srgb&fm=jpg&w=2000&q=85"
+      },
+      "whatAreLabGrown": {
+        "title": "What Are Lab-Grown Diamonds?",
+        "p1": "Lab-grown diamonds are real diamonds — not imitations, and not a separate category of gemstone. They're created using one of two established methods, CVD (Chemical Vapour Deposition — A standard at HOS) or HPHT (High Pressure High Temperature), which replicate the exact natural process that forms diamonds underground, just inside a controlled lab environment instead of the earth's crust over billions of years.",
+        "p2": "The result is a stone that is chemically, physically, and optically identical to a mined diamond: the same carbon crystal structure, the same hardness, the same brilliance and fire. Every House of Seya diamond is IGI certified, so that identity is independently documented, not just claimed.",
+        "image": "https://images.unsplash.com/photo-1624588057318-5f1b2eb81012?crop=entropy&cs=srgb&fm=jpg&w=1200&q=85"
+      },
+      "fourCs": {
+        "title": "THE 4C'S OF DIAMONDS",
+        "intro": "Every diamond, lab-grown or mined, is evaluated on the same four characteristics. Understanding them is the single most useful thing you can do before buying.",
+        "items": [
+          {
+            "title": "Cut",
+            "body": "Cut is the most important of the 4Cs, and the one most buyers underweight. It refers to how well a diamond's facets interact with light — a well-cut diamond reflects light back through the top of the stone, creating the brilliance and sparkle diamonds are prized for. A poorly cut diamond can look dull even with excellent color and clarity. For the best balance of beauty and value, look for an Excellent or Very Good cut grade."
+          },
+          {
+            "title": "Colour",
+            "body": "Colour measures how close to colourless a white diamond is, graded on a scale from D (completely colourless) to Z (noticeably tinted). The closer to D, the rarer and more valuable the stone. Most buyers find the best value in the G–H range, where any warmth is essentially invisible to the naked eye but the price is meaningfully lower than a D-E-F stone."
+          },
+          {
+            "title": "Clarity",
+            "body": "Clarity measures internal inclusions and external blemishes — natural characteristics formed during the diamond's growth. Grades range from Flawless (extremely rare) down to Included (visible inclusions to the naked eye). VS1–VS2 and SI1 grades typically offer inclusions invisible without magnification, making them the sweet spot for value-conscious buyers."
+          },
+          {
+            "title": "Carat",
+            "body": "Carat measures a diamond's weight, not its size directly — though the two are closely related. One carat equals 200 milligrams. Because larger diamonds are rarer, price increases disproportionately as carat weight goes up. A well-cut diamond can also appear larger than its carat weight suggests, which is part of why cut quality matters more than raw size."
+          }
+        ]
+      },
+      "comparison": {
+        "title": "Lab-Grown vs. Natural Diamond: A Clear Comparison",
+        "headers": [
+          "Factor",
+          "Lab-Grown Diamond",
+          "Natural Mined Diamond"
+        ],
+        "rows": [
+          {
+            "factor": "Chemical Composition",
+            "labGrown": "100% pure carbon",
+            "natural": "100% pure carbon"
+          },
+          {
+            "factor": "Hardness (Mohs Scale)",
+            "labGrown": "10",
+            "natural": "10"
+          },
+          {
+            "factor": "Optical Properties",
+            "labGrown": "Identical brilliance and fire",
+            "natural": "Identical brilliance and fire"
+          },
+          {
+            "factor": "Formation Time",
+            "labGrown": "Weeks, in a controlled lab",
+            "natural": "Billions of years, underground"
+          },
+          {
+            "factor": "Visible to the Naked Eye",
+            "labGrown": "Indistinguishable without specialized equipment",
+            "natural": "Indistinguishable without specialized equipment"
+          },
+          {
+            "factor": "Origin Traceability",
+            "labGrown": "Fully traceable, conflict-free by nature",
+            "natural": "Traceable only where supply chain is certified"
+          },
+          {
+            "factor": "Price for Equal Quality",
+            "labGrown": "Significantly lower",
+            "natural": "Higher, due to mining and distribution costs"
+          }
+        ],
+        "concluding": "The two are graded on the exact same 4Cs scale, by the same gemological institutes. The only meaningful difference is origin — and that difference is precisely what makes lab-grown diamonds more accessible without compromising on what a diamond actually is."
+      },
+      "certification": {
+        "title": "Understanding IGI Certification",
+        "p1": "A diamond certificate is effectively an identity document for your stone. It's issued by an independent gemological laboratory — not the jeweler selling the diamond — after the stone has been examined and graded under controlled conditions. This independence is what makes a certificate meaningful: it's a second, unbiased opinion on exactly what you're buying.",
+        "p2": "House of Seya diamonds are certified by IGI (International Gemological Institute), one of the world's most widely recognized and trusted grading authorities.",
+        "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&w=1200&q=85",
+        "headers": [
+          "What IGI Certifies",
+          "Why It Matters to You"
+        ],
+        "rows": [
+          {
+            "certifies": "Cut grade",
+            "matters": "Confirms the diamond is shaped for maximum light return"
+          },
+          {
+            "certifies": "Colour grade",
+            "matters": "Verifies the exact colour on the recognized grading scale"
+          },
+          {
+            "certifies": "Clarity grade",
+            "matters": "Documents all internal and external characteristics"
+          },
+          {
+            "certifies": "Carat weight",
+            "matters": "Confirms the precise weight of the stone"
+          },
+          {
+            "certifies": "Diamond origin",
+            "matters": "Identifies the stone as laboratory-grown"
+          },
+          {
+            "certifies": "Measurements & proportions",
+            "matters": "Confirms the stone matches its stated cut and dimensions"
+          }
+        ],
+        "concluding": "Every House of Seya diamond ships with its IGI certificate. It's not an optional upgrade — it's how we make sure you never have to simply take our word for what you're buying."
+      },
+      "buyingMistakes": {
+        "title": "Common Diamond Buying Mistakes",
+        "items": [
+          {
+            "num": "01",
+            "text": "Prioritising carat size over cut quality — a smaller, well-cut diamond will often out-sparkle a larger, poorly cut one."
+          },
+          {
+            "num": "02",
+            "text": "Buying without a certificate, or accepting a certificate from an unfamiliar, non-independent lab."
+          },
+          {
+            "num": "03",
+            "text": "Assuming all diamonds within a grade look identical — cut quality and fluorescence can meaningfully affect appearance even within the same clarity or colour grade."
+          },
+          {
+            "num": "04",
+            "text": "Not asking whether the stone is lab-grown or mined — reputable sellers should always disclose this clearly, not leave it ambiguous."
+          }
+        ]
+      },
+      "myths": {
+        "title": "Common Myths About Lab-Grown Diamonds",
+        "items": [
+          {
+            "myth": "Lab-grown diamonds are fake diamonds.",
+            "reality": "A lab-grown diamond is exactly as real as a mined one — same carbon structure, same hardness, same optical properties. The only difference is where it was created."
+          },
+          {
+            "myth": "You can tell a lab-grown diamond apart with the naked eye.",
+            "reality": "You cannot. Even trained gemologists need specialized equipment, like spectroscopy, to distinguish origin — visual inspection alone isn't enough."
+          },
+          {
+            "myth": "Lab-grown diamonds won't hold up over time.",
+            "reality": "With a hardness of 10 on the Mohs scale — the same as natural diamonds — lab-grown diamonds are exceptionally durable and are not more prone to damage or dulling with age."
+          },
+          {
+            "myth": "Certification doesn't matter for lab-grown diamonds.",
+            "reality": "If anything, certification matters just as much. It's the only independent confirmation of the exact cut, colour, clarity, and carat weight you're paying for, regardless of origin."
+          }
+        ]
+      },
+      "faqs": [
+        {
+          "q": "Are lab-grown diamonds graded on the same scale as natural diamonds?",
+          "a": "Yes. Lab-grown diamonds are graded using the same 4Cs — cut, colour, clarity, and carat weight — as natural diamonds. At House of Seya, every diamond comes with full IGI grading documentation for complete transparency."
+        },
+        {
+          "q": "Do lab-grown diamonds lose their shine over time?",
+          "a": "No. Lab-grown diamonds retain their brilliance and clarity permanently. With a hardness of 10 on the Mohs scale, they're extremely durable and suitable for daily wear as well as pieces meant to last a lifetime."
+        },
+        {
+          "q": "How much more affordable are lab-grown diamonds than mined diamonds?",
+          "a": "Generally, lab-grown diamonds offer meaningfully better value for the same size and quality, since the supply chain avoids the costs associated with mining, exploration, and distribution of natural stones."
+        },
+        {
+          "q": "What's the difference between CVD and HPHT lab-grown diamonds?",
+          "a": "Both are legitimate methods of growing diamonds in a lab. CVD (Chemical Vapour Deposition) grows a diamond layer by layer from a carbon-rich gas. HPHT (High Pressure High Temperature) replicates the natural underground conditions using extreme pressure and heat. Both produce chemically identical, real diamonds."
+        },
+        {
+          "q": "Why does IGI certification matter if I trust the brand I'm buying from?",
+          "a": "Because a certificate is independent of the seller. It's issued by a third-party gemological lab with no stake in the sale, so it protects you even if your assessment of the brand later changes. It's documentation you keep, not just a claim you were told."
+        }
+      ]
+    },
+    "customise": {
+      "hero": {
+        "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?crop=entropy&cs=srgb&fm=jpg&w=2000&q=85",
+        "headline": "Your Diamond,\nYour Design",
+        "subhead": "At House of Seya, our customisation service lets you build a piece around the diamond you choose — guided every step of the way, so what you end up with is genuinely, personally yours.",
+        "cta": "Start Customising"
+      },
+      "intro": {
+        "body": "At House of Seya, our customisation service lets you build a piece around the diamond you choose — guided every step of the way, so what you end up with is genuinely, personally yours."
+      },
+      "step1": {
+        "title": "Step 1: Choose Your Piece",
+        "body": "This is where your design begins. Select the foundation for your custom piece — ring, earrings, necklace, or bracelet — and we'll guide you through the rest from there.",
+        "options": [
+          "Rings",
+          "Earrings",
+          "Necklace",
+          "Bracelet"
+        ]
+      },
+      "step2": {
+        "title": "Step 2: Choose Your Diamond",
+        "body1": "Every House of Seya piece starts with the diamond, not the setting. Choose from a range of diamond shapes, each with its own character — round for maximum brilliance, oval for an elongating effect, emerald for quiet, architectural elegance, and more.",
+        "body2": "We'll guide you through the essentials of the 4Cs — cut, colour, clarity, and carat — so you can make an informed choice, not a guess. Every diamond you select is IGI certified, with full documentation of exactly what you're choosing.",
+        "microCallout": "Why cut matters most: A diamond's cut determines how well it reflects light — it's the single biggest factor in how much a diamond actually sparkles, more than size or clarity. We'll help you prioritise it.",
+        "shapes": [
+          "Round",
+          "Oval",
+          "Emerald",
+          "Cushion",
+          "Pear",
+          "Marquise",
+          "Princess"
+        ]
+      },
+      "step3": {
+        "title": "Step 3: Choose Your Setting",
+        "body1": "From Pavé to Halo to Bezel, every setting holds a different presence. A halo makes your diamond look larger and catches more light. A bezel setting wraps the diamond in metal for a modern, protective look, ideal for daily wear. Pavé adds a continuous line of brilliance around the band.",
+        "body2": "We'll help you choose what complements your diamond and fits your lifestyle — whether that's a setting built to withstand daily wear or one designed to make a bigger statement.",
+        "settings": [
+          "Solitaire",
+          "Halo",
+          "Pavé",
+          "Bezel",
+          "Cluster"
+        ]
+      },
+      "step4": {
+        "title": "Step 4: Personalise It",
+        "body": "This is where it becomes truly yours. Think a hidden halo beneath the main stone, a personal engraving on the inside of a band or the back of a pendant, or a whisper of hidden diamonds that catch light distinctively when you move. Small touches that make a piece deeply personal.",
+        "options": [
+          "Hidden diamond accents",
+          "Engraving (initials, dates, or a short message)",
+          "Birthstone or coloured stone accents"
+        ]
+      },
+      "step5": {
+        "title": "Step 5: Choose Your Finish",
+        "body": "We craft every custom piece in 24K gold vermeil — a rich, 2.5-micron layer of pure gold set over BIS hallmarked sterling silver. That thickness is the genuine international minimum for the vermeil label, well above the roughly 0.5 microns typical of ordinary gold plating, giving you real richness and everyday durability without the price of solid gold.",
+        "finishes": [
+          "Yellow Gold",
+          "Rose Gold",
+          "White Gold"
+        ]
+      },
+      "process": {
+        "title": "From Your Vision to Your Doorstep",
+        "body": "Once you've built your design, a House of Seya advisor will reach out to walk through your selections, confirm your diamond's certification details, and share a rendering of your piece before it's made — so there are no surprises between your vision and the final piece.",
+        "editorialNote": "[Suggested process copy — confirm actual turnaround time, deposit/payment structure, and delivery timeline with your operations team before publishing, since these numbers will be customer-facing commitments.]",
+        "steps": [
+          {
+            "title": "Share Your Vision",
+            "body": "Send us your idea — a sketch, a reference photo, or just a description of what you're picturing."
+          },
+          {
+            "title": "We Design It",
+            "body": "Our team conceptualises the piece and shares a rendering for your review before anything is made."
+          },
+          {
+            "title": "It Comes to Life",
+            "body": "Once you approve the design, your piece is handcrafted and shipped straight to you."
+          }
+        ]
+      },
+      "faqs": [
+        {
+          "q": "Can I really design my own piece from scratch, or am I choosing from templates?",
+          "a": "Both — you can build a fully custom design around your chosen diamond, or start from one of our existing settings and personalise it with engraving, accents, or a different finish. Either way, the piece is built around your certified diamond, not a generic template."
+        },
+        {
+          "q": "Will my custom diamond still be IGI certified?",
+          "a": "Yes. Every diamond available through our customisation service is IGI certified, regardless of the shape, setting, or personalisation you choose."
+        },
+        {
+          "q": "How long does a custom piece take to make?",
+          "a": "A custom piece generally takes about 4-5 weeks time depending on intricacy. Best things are never rushed."
+        },
+        {
+          "q": "Is the gold vermeil finish the same quality across custom and ready-made pieces?",
+          "a": "Yes. Every custom piece is finished in the same 2.5-micron 24K gold vermeil over BIS hallmarked sterling silver used across our entire collection — customisation changes the design, never the material standard."
+        },
+        {
+          "q": "What if I'm not sure exactly what I want?",
+          "a": "That's exactly what the guided steps are for. Start with the diamond shape or piece type you're drawn to, and our advisors will help narrow down the rest based on your style and how you plan to wear the piece."
+        }
+      ],
+      "possibilities": [
+        {
+          "title": "Start with an Idea",
+          "body": "A photo, a sketch, or even a piece you already own — we can work from almost anything.",
+          "image": "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?crop=entropy&cs=srgb&fm=jpg&w=900&q=85"
+        },
+        {
+          "title": "Choose Your Diamond",
+          "body": "Pick a shape and carat that feels like you — every stone is IGI certified.",
+          "image": "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?crop=entropy&cs=srgb&fm=jpg&w=900&q=85"
+        },
+        {
+          "title": "Define Your Setting",
+          "body": "Solitaire, halo, vintage-inspired — we'll help you land on a setting that suits the stone and the story.",
+          "image": "https://images.unsplash.com/photo-1650389236412-e7413cbcf2fe?crop=entropy&cs=srgb&fm=jpg&w=900&q=85"
+        },
+        {
+          "title": "Add a Personal Touch",
+          "body": "Engravings, birthstones, a hidden detail only you know about — the finishing touches are yours to choose.",
+          "image": "https://images.pexels.com/photos/279183/pexels-photo-279183.jpeg?auto=compress&cs=tinysrgb&w=900"
+        }
+      ],
+      "considerations": [
+        {
+          "title": "Metals",
+          "body": "We work in 24K gold vermeil over a BIS hallmarked sterling silver base, available in yellow, white, and rose gold."
+        },
+        {
+          "title": "Diamond Shapes",
+          "body": "Round, oval, princess, emerald, radiant, pear, heart, cushion, marquise, or asscher — your call."
+        },
+        {
+          "title": "Timeline",
+          "body": "Custom pieces typically take 3–4 weeks depending on complexity. The best things are worth the wait."
+        }
+      ]
+    },
+    "gifting": {
+      "hero": {
+        "image": "https://images.pexels.com/photos/28146843/pexels-photo-28146843.jpeg?auto=compress&cs=tinysrgb&w=2000",
+        "tagline": "The Art of Gifting",
+        "title": "A Gift They'll Actually Wear"
+      },
+      "categories": [
+        {
+          "title": "For Her",
+          "body": "Birthdays, anniversaries, or just because — a piece that says more than the card ever could.",
+          "image": "https://images.unsplash.com/photo-1624588057318-5f1b2eb81012?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+          "href": "/collections/new-collection"
+        },
+        {
+          "title": "Celebrating Her",
+          "body": "For the mothers, sisters, and daughters who've earned something as considered as they are.",
+          "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?crop=entropy&cs=srgb&fm=jpg&w=900&q=85",
+          "href": "/collections/new-collection"
+        },
+        {
+          "title": "Ensemble Gifting",
+          "body": "Bridesmaid keepsakes, corporate gifting, or a curated set — talk to a consultant about gifting at scale.",
+          "image": "https://images.pexels.com/photos/20838859/pexels-photo-20838859.jpeg?auto=compress&cs=tinysrgb&w=900",
+          "href": null
+        }
+      ],
+      "readyToShip": {
+        "title": "Ready to Ship",
+        "body": "Running short on time? Our in-stock pieces ship within 2–3 days, so the gift still arrives right on time."
+      },
+      "supporting": [
+        {
+          "title": "Planned to Perfection",
+          "body": "Not sure what to pick? Message us and we'll help you land on something they'll genuinely love.",
+          "image": "https://images.unsplash.com/photo-1650389236412-e7413cbcf2fe?crop=entropy&cs=srgb&fm=jpg&w=900&q=85"
+        },
+        {
+          "title": "Gift Packaging",
+          "body": "Every order arrives beautifully packaged, ready to hand over exactly as it is — no extra wrapping needed.",
+          "image": "https://images.pexels.com/photos/279183/pexels-photo-279183.jpeg?auto=compress&cs=tinysrgb&w=900"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "Can I exchange it if they don't like it?",
+          "a": "Yes. In-stock pieces can be returned unused within 7 days for a full exchange or store credit."
+        },
+        {
+          "q": "How fast can it ship?",
+          "a": "In-stock pieces typically ship within 2–3 days. Message us if you need it sooner and we'll do what we can."
+        },
+        {
+          "q": "How is it packaged?",
+          "a": "Every piece arrives in House of Seya's signature packaging, ready to gift as-is."
+        }
+      ]
+    },
+    "goldVermeil": {
+      "title": "Gold & Metals Guide",
+      "heading": "The Setting: 24K Gold Vermeil",
+      "subheading": "Heavy gold vermeil over 925 sterling silver — 5x thicker than ordinary flash plating.",
+      "corePillars": [
+        {
+          "title": "Core Metal",
+          "desc": "Solid 925 Sterling Silver — hypoallergenic, nickel-free."
+        },
+        {
+          "title": "Gold Purity",
+          "desc": "24K Pure Gold layer electroplated with precision."
+        },
+        {
+          "title": "Plating Thickness",
+          "desc": "Minimum 2.5 microns — standard vermeil classification."
+        }
+      ]
+    }
+  }
+}

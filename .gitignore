@@ -1,0 +1,83 @@
+# ==========================================
+# HOUSE OF SEYA - Backend + Admin
+# ==========================================
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Build / Generated Output
+dist/
+build/
+client/dist/
+client/build/
+
+# TypeScript / tooling generated files
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Prisma generated client
+node_modules/.prisma/
+node_modules/@prisma/client/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma temporary/debug files
+prisma/*.log
+
+# Runtime uploaded media
+uploads/
+storage/
+/media/
+public/uploads/
+public/media/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+*.iml
+
+# Temporary / backup
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Testing / coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.vite/
+.eslintcache
+
+# Archives / generated packages
+*.tgz
+*.zip
