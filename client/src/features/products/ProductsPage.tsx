@@ -145,7 +145,7 @@ export const ProductsPage: React.FC = () => {
       accessor: (row) => (
         <div className="text-xs text-graphite-600">
           {row.totalDiamondCt ? <p>{row.totalDiamondCt} ct diamond</p> : null}
-          {row.netWeightGrams ? <p className="text-[11px] text-graphite-400">{row.netWeightGrams}g net</p> : null}
+          {row.netWeightGrams ? <p className="text-[11px] text-graphite-400">{row.netWeightGrams}g</p> : null}
           {!row.totalDiamondCt && !row.netWeightGrams && <span>—</span>}
         </div>
       ),
@@ -300,7 +300,7 @@ export const ProductsPage: React.FC = () => {
         onClose={() => setDeletingProduct(null)}
         onConfirm={handleDeleteProduct}
         title="Delete Product"
-        message={`Are you sure you want to delete "${deletingProduct?.name}"? This action will remove the product from active inventory.`}
+        message={`Are you sure you want to delete "${deletingProduct?.name}"? Its images will also be deleted from the server.`}
         confirmText="Delete Product"
         isLoading={isDeleting}
       />

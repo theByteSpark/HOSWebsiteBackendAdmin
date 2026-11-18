@@ -1,4 +1,4 @@
-export type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'STAFF';
+export type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'STAFF' | 'SEO_MANAGER';
 
 export interface AdminUser {
   id: string;
@@ -294,4 +294,27 @@ export interface DashboardStats {
   revenueChart?: { date: string; revenue: number; orders: number }[];
   recentOrders?: Order[];
   topProducts?: { id: string; name: string; salesCount: number; totalRevenue: number }[];
+}
+
+export type BlogStatus = 'DRAFT' | 'PUBLISHED';
+
+export interface BlogSummary {
+  id: string;
+  slug: string;
+  title: string;
+  coverImage?: string | null;
+  status: BlogStatus;
+  publishedAt?: string | null;
+  authorName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Blog extends BlogSummary {
+  excerpt?: string | null;
+  coverImageAlt?: string | null;
+  content: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaKeywords: string[];
 }

@@ -223,6 +223,7 @@ export const SettingsPage: React.FC = () => {
                   { value: 'ADMIN', label: 'Admin (Full product, content, order management)' },
                   { value: 'MANAGER', label: 'Manager (Orders, inventory, customer management)' },
                   { value: 'STAFF', label: 'Staff (Read & update orders only)' },
+                  { value: 'SEO_MANAGER', label: 'SEO Manager (Blogs only: write, edit, publish)' },
                 ]}
               />
 

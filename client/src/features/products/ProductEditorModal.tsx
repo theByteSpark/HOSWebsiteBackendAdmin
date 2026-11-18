@@ -83,7 +83,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   const [description, setDescription]         = useState('');
   const [netWeightGrams, setNetWeightGrams]   = useState('');
   const [totalDiamondCt, setTotalDiamondCt]   = useState('');
-  const [smallDiamondCt, setSmallDiamondCt]   = useState('');
   const [totalDiamondPcs, setTotalDiamondPcs] = useState('');
   const [diamondGrade, setDiamondGrade]       = useState('EF VVS-VS');
   const [isPublished, setIsPublished]         = useState(false);
@@ -111,7 +110,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
       setDescription(product.description || '');
       setNetWeightGrams(product.netWeightGrams ? String(product.netWeightGrams) : '');
       setTotalDiamondCt(product.totalDiamondCt ? String(product.totalDiamondCt) : '');
-      setSmallDiamondCt(product.smallDiamondCt ? String(product.smallDiamondCt) : '');
       setTotalDiamondPcs(product.totalDiamondPcs ? String(product.totalDiamondPcs) : '');
       setDiamondGrade(product.diamondGrade || 'EF VVS-VS');
       setIsPublished(product.isPublished);
@@ -136,7 +134,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
       setName(''); setSku('');
       setSubcategoryId('');
       setPrice(''); setDescription('');
-      setNetWeightGrams(''); setTotalDiamondCt(''); setSmallDiamondCt(''); setTotalDiamondPcs('');
+      setNetWeightGrams(''); setTotalDiamondCt(''); setTotalDiamondPcs('');
       setDiamondGrade('EF VVS-VS'); setIsPublished(true); setInStock(true);
       setMetalSections(buildMetalSections(null));
       setGalleryImages([]);
@@ -169,9 +167,8 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     if (!sku.trim()) missing.push('SKU Code');
     if (!subcategoryId) missing.push('Subcategory');
     if (!price || Number(price) <= 0) missing.push('Price');
-    if (netWeightGrams === '') missing.push('Net Weight');
+    if (netWeightGrams === '') missing.push('Product Weight');
     if (totalDiamondCt === '') missing.push('Total Diamond Weight');
-    if (smallDiamondCt === '') missing.push('Small Diamond Weight');
     if (!totalDiamondPcs || Number(totalDiamondPcs) < 1) missing.push('Total Diamond Pieces');
     if (!description.trim()) missing.push('Description');
     if (!metalSections.some(s => s.enabled)) missing.push('at least one Metal Finish');
@@ -205,7 +202,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           description: description.trim(),
           netWeightGrams: Number(netWeightGrams),
           totalDiamondCt: Number(totalDiamondCt),
-          smallDiamondCt: Number(smallDiamondCt),
           totalDiamondPcs: Number(totalDiamondPcs),
           diamondGrade: diamondGrade || null,
           isPublished,
@@ -249,7 +245,6 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           description: description.trim(),
           netWeightGrams: Number(netWeightGrams),
           totalDiamondCt: Number(totalDiamondCt),
-          smallDiamondCt: Number(smallDiamondCt),
           totalDiamondPcs: Number(totalDiamondPcs),
           diamondGrade: diamondGrade || null,
           isPublished,
@@ -352,10 +347,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-graphite-700">
             <Gem className="h-4 w-4 text-brand-700" /> Diamond &amp; Crafting Specifications
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Input label="Net Weight (g) *" type="number" step="0.01" min="0" required placeholder="3.20" value={netWeightGrams} onChange={e => setNetWeightGrams(e.target.value)} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Input label="Product Weight (g) *" type="number" step="0.01" min="0" required placeholder="3.20" value={netWeightGrams} onChange={e => setNetWeightGrams(e.target.value)} />
             <Input label="Total Diamond Weight (ct) *" type="number" step="0.001" min="0" required placeholder="0.85" value={totalDiamondCt} onChange={e => setTotalDiamondCt(e.target.value)} />
-            <Input label="Small Diamond Weight (ct) *" type="number" step="0.001" min="0" required placeholder="0.25" value={smallDiamondCt} onChange={e => setSmallDiamondCt(e.target.value)} />
             <Input label="Total Diamond Pieces *" type="number" min="1" step="1" required placeholder="21" value={totalDiamondPcs} onChange={e => setTotalDiamondPcs(e.target.value)} />
           </div>
           <p className="text-[11px] text-graphite-500 italic">Shown on the website under Product Details. Standard: 24K Gold Vermeil over BIS hallmarked sterling silver; all diamonds IGI certified, EF colour, VVS-VS clarity.</p>

@@ -20,9 +20,8 @@ const COLUMNS = [
   { key: 'sku', header: 'SKU', width: 16 },
   { key: 'subcategory', header: 'Subcategory', width: 20 },
   { key: 'price', header: 'Price (INR)', width: 14 },
-  { key: 'netWeight', header: 'Net Weight (g)', width: 16 },
+  { key: 'netWeight', header: 'Product Weight (g)', width: 18, alias: 'Net Weight (g)' },
   { key: 'totalDiamondCt', header: 'Total Diamond Weight (ct)', width: 26 },
-  { key: 'smallDiamondCt', header: 'Small Diamond Weight (ct)', width: 26 },
   { key: 'totalDiamondPcs', header: 'Total Diamond Pieces', width: 20 },
   { key: 'description', header: 'Description', width: 50 },
   { key: 'image1', header: 'Image 1', width: 24, optional: true },
@@ -82,9 +81,8 @@ export const downloadProductTemplate = async (_req: Request, res: Response) => {
       sku: 'Required. Unique code. If the SKU already exists, that product is UPDATED (empty cells are left unchanged).',
       subcategory: `Required for new products. The category is set automatically from it. Available: ${allSubs.join(', ') || 'existing subcategory names'}.`,
       price: 'Required for new products. Number greater than 0, e.g. 45000.',
-      netWeight: 'Required for new products. Number, e.g. 3.2.',
+      netWeight: 'Required for new products. Weight of the piece in grams, e.g. 3.2.',
       totalDiamondCt: 'Required for new products. Number, e.g. 0.85.',
-      smallDiamondCt: 'Required for new products. Number, e.g. 0.25. Cannot exceed the total diamond weight.',
       totalDiamondPcs: 'Required for new products. Whole number of 1 or more, e.g. 21.',
       description: 'Required for new products. Text shown on the product page.',
       image1: imageNote,
@@ -175,7 +173,7 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
     const colIndex: Partial<Record<ColumnKey, number>> = {};
     ws.getRow(1).eachCell((cell, col) => {
       const h = norm(cellText(cell.value));
-      const match = COLUMNS.find((c) => norm(c.header) === h);
+      const match = COLUMNS.find((c) => norm(c.header) === h || ('alias' in c && norm(c.alias) === h));
       if (match) colIndex[match.key] = col;
     });
     const missingCols = REQUIRED.filter((c) => !colIndex[c.key]).map((c) => c.header);
@@ -191,8 +189,7 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
       prisma.productCategory.findMany({ include: { subcategories: true } }),
       prisma.product.findMany({
         select: {
-          id: true, sku: true, slug: true, categoryId: true, subcategoryId: true,
-          totalDiamondCt: true, smallDiamondCt: true,
+          id: true, sku: true, slug: true, categoryId: true, subcategoryId: true, deletedAt: true,
         },
       }),
       prisma.mediaAsset.findMany({
@@ -245,9 +242,11 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
       if (raw.sku) seenSkus.add(skuKey);
       const existing = raw.sku ? bySku.get(skuKey) : undefined;
       const isUpdate = !!existing;
+      // A SKU that belongs to a deleted product is brought back (needs the full set of fields, like a new one).
+      const isRestore = !!existing?.deletedAt;
 
       // ── Required fields (only for new products) ──
-      if (!isUpdate) {
+      if (!isUpdate || isRestore) {
         const empty = REQUIRED.filter((c) => c.key !== 'sku' && raw[c.key] === '').map((c) => c.header);
         if (empty.length > 0) problems.push(`Missing: ${empty.join(', ')}`);
       }
@@ -277,19 +276,14 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
       const price = num('price');
       const netWeight = num('netWeight');
       const totalCt = num('totalDiamondCt');
-      const smallCt = num('smallDiamondCt');
       const pcs = num('totalDiamondPcs');
       if (raw.price && !(price > 0)) problems.push('Price must be a number greater than 0');
-      if (raw.netWeight && !(netWeight >= 0)) problems.push('Net Weight must be a number');
+      else if (raw.price && price > 99999999.99) problems.push('Price is too large');
+      if (raw.netWeight && !(netWeight >= 0)) problems.push('Product Weight must be a number');
+      else if (raw.netWeight && netWeight > 9999.99) problems.push('Product Weight must be 9999.99 g or less');
       if (raw.totalDiamondCt && !(totalCt >= 0)) problems.push('Total Diamond Weight must be a number');
-      if (raw.smallDiamondCt && !(smallCt >= 0)) problems.push('Small Diamond Weight must be a number');
+      else if (raw.totalDiamondCt && totalCt > 999.999) problems.push('Total Diamond Weight must be 999.999 ct or less');
       if (raw.totalDiamondPcs && !(Number.isInteger(pcs) && pcs >= 1)) problems.push('Total Diamond Pieces must be a whole number of 1 or more');
-
-      const effTotal = raw.totalDiamondCt ? totalCt : existing?.totalDiamondCt != null ? Number(existing.totalDiamondCt) : undefined;
-      const effSmall = raw.smallDiamondCt ? smallCt : existing?.smallDiamondCt != null ? Number(existing.smallDiamondCt) : undefined;
-      if (effTotal !== undefined && effSmall !== undefined && effSmall > effTotal) {
-        problems.push('Small Diamond Weight cannot exceed Total Diamond Weight');
-      }
 
       // ── Images ──
       const imageNames = IMAGE_KEYS.map((k) => raw[k]).filter(Boolean);
@@ -326,6 +320,7 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
       try {
         if (isUpdate) {
           const data: any = {};
+          if (isRestore) Object.assign(data, { deletedAt: null, isPublished: true, inStock: true });
           if (raw.name) data.name = raw.name;
           if (categoryId) data.categoryId = categoryId;
           if (subcategoryId) data.subcategoryId = subcategoryId;
@@ -333,7 +328,6 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
           if (raw.description) data.description = raw.description;
           if (raw.netWeight) data.netWeightGrams = netWeight;
           if (raw.totalDiamondCt) data.totalDiamondCt = totalCt;
-          if (raw.smallDiamondCt) data.smallDiamondCt = smallCt;
           if (raw.totalDiamondPcs) data.totalDiamondPcs = pcs;
 
           const ops: any[] = [];
@@ -368,7 +362,6 @@ export const bulkCreateProducts = async (req: Request, res: Response) => {
               inStock: true,
               netWeightGrams: netWeight,
               totalDiamondCt: totalCt,
-              smallDiamondCt: smallCt,
               totalDiamondPcs: pcs,
               diamondGrade: 'EF VVS-VS',
               images: imageRows.length > 0 ? { create: imageRows } : undefined,

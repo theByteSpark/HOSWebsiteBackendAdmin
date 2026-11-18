@@ -36,6 +36,8 @@ interface ImageUploaderProps {
   /** Which upload context drives ratio enforcement + crop. */
   uploadContext?: ImageUploadContextKey;
   folder?: string;
+  /** Upload endpoint. Defaults to the general media library; blogs use their own locked-down route. */
+  endpoint?: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -67,6 +69,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   aspectRatioGuidance,
   uploadContext,
   folder = 'general',
+  endpoint = '/media/upload',
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -99,7 +102,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       }
       formData.append('file', file);
 
-      const res = await apiClient.post('/media/upload', formData, {
+      const res = await apiClient.post(endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

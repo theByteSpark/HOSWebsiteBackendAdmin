@@ -45,6 +45,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) =
         return 'bg-brand-50 text-brand-700 border-brand-200';
       case 'MANAGER':
         return 'bg-sky-50 text-sky-700 border-sky-200';
+      case 'SEO_MANAGER':
+        return 'bg-violet-50 text-violet-700 border-violet-200';
       case 'STAFF':
         return 'bg-graphite-100 text-graphite-700 border-graphite-200';
 

@@ -37,6 +37,9 @@ export const ImagesPage: React.FC = () => {
   const [unusedOnly, setUnusedOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<MediaAsset | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [allMatching, setAllMatching] = useState(false);
+  const [confirmBulk, setConfirmBulk] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -63,6 +66,34 @@ export const ImagesPage: React.FC = () => {
   });
 
   const assets = data?.assets || [];
+  const totalCount = data?.total ?? 0;
+  const pageAllSelected = assets.length > 0 && assets.every((a) => selected.has(a.id));
+  const selectedCount = allMatching ? totalCount : selected.size;
+
+  const clearSelection = () => {
+    setSelected(new Set());
+    setAllMatching(false);
+  };
+
+  const toggleOne = (id: string) => {
+    setAllMatching(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const togglePage = () => {
+    setAllMatching(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (pageAllSelected) assets.forEach((a) => next.delete(a.id));
+      else assets.forEach((a) => next.add(a.id));
+      return next;
+    });
+  };
 
   const uploadOne = async (file: File): Promise<UploadResult> => {
     const name = file.name.trim();
@@ -121,19 +152,32 @@ export const ImagesPage: React.FC = () => {
     refetch();
   };
 
-  const handleDelete = async () => {
-    if (!deleting) return;
+  const runDelete = async (body: Record<string, unknown>) => {
     setIsDeleting(true);
     setDeleteError(null);
     try {
-      await apiClient.delete(`/media/${deleting.id}`);
-      setDeleting(null);
-      refetch();
+      await apiClient.post('/media/bulk-delete', body);
+      clearSelection();
+      setPage(1);
+      await refetch();
     } catch (err: any) {
-      setDeleteError(err.response?.data?.message || 'Failed to delete image.');
-      setDeleting(null);
+      setDeleteError(err.response?.data?.message || 'Failed to delete images.');
     } finally {
       setIsDeleting(false);
+      setDeleting(null);
+      setConfirmBulk(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (deleting) runDelete({ ids: [deleting.id] });
+  };
+
+  const handleBulkDelete = () => {
+    if (allMatching) {
+      runDelete({ all: true, folder: 'products', search: search.trim() || undefined, unused: unusedOnly || undefined });
+    } else {
+      runDelete({ ids: Array.from(selected) });
     }
   };
 
@@ -208,6 +252,7 @@ export const ImagesPage: React.FC = () => {
           onChange={(v) => {
             setSearch(v);
             setPage(1);
+            clearSelection();
           }}
           placeholder="Search by file name..."
           className="w-full sm:max-w-xs"
@@ -219,6 +264,7 @@ export const ImagesPage: React.FC = () => {
             onChange={(e) => {
               setUnusedOnly(e.target.checked);
               setPage(1);
+              clearSelection();
             }}
             className="h-4 w-4"
           />
@@ -226,6 +272,33 @@ export const ImagesPage: React.FC = () => {
         </label>
         <span className="text-xs text-graphite-400 sm:ml-auto">{data?.total ?? 0} image(s)</span>
       </div>
+
+      {totalCount > 0 && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-graphite-200 bg-white px-4 py-2.5 text-xs">
+          <label className="flex cursor-pointer items-center gap-2 font-semibold text-graphite-700">
+            <input type="checkbox" checked={pageAllSelected || allMatching} onChange={togglePage} className="h-4 w-4" />
+            Select all on this page
+          </label>
+          {pageAllSelected && !allMatching && totalCount > assets.length && (
+            <button type="button" onClick={() => setAllMatching(true)} className="font-semibold text-brand-600 hover:underline">
+              Select all {totalCount} images
+            </button>
+          )}
+          {selectedCount > 0 && (
+            <>
+              <span className="text-graphite-500">
+                {allMatching ? `All ${totalCount} images selected` : `${selectedCount} selected`}
+              </span>
+              <button type="button" onClick={clearSelection} className="text-graphite-400 hover:text-graphite-700">
+                Clear
+              </button>
+              <Button size="sm" variant="destructive" className="sm:ml-auto" onClick={() => setConfirmBulk(true)}>
+                <Trash2 className="mr-1 h-4 w-4" /> Delete selected ({selectedCount})
+              </Button>
+            </>
+          )}
+        </div>
+      )}
 
       {deleteError && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-700">{deleteError}</div>
@@ -248,6 +321,14 @@ export const ImagesPage: React.FC = () => {
                   onError={(e) => {
                     if (e.currentTarget.src !== a.url) e.currentTarget.src = a.url;
                   }}
+                />
+                <input
+                  type="checkbox"
+                  checked={allMatching || selected.has(a.id)}
+                  onChange={() => toggleOne(a.id)}
+                  disabled={allMatching}
+                  className="absolute right-1.5 top-1.5 h-4 w-4 cursor-pointer"
+                  aria-label={`Select ${a.originalName}`}
                 />
                 <span
                   className={`absolute left-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
@@ -272,10 +353,9 @@ export const ImagesPage: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      title={a.inUse ? 'In use — cannot delete' : 'Delete image'}
-                      disabled={a.inUse}
+                      title="Delete image"
                       onClick={() => setDeleting(a)}
-                      className="rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30"
+                      className="rounded p-1 text-red-400 hover:bg-red-50 hover:text-red-700"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -300,8 +380,18 @@ export const ImagesPage: React.FC = () => {
         onClose={() => setDeleting(null)}
         onConfirm={handleDelete}
         title="Delete Image"
-        message={`Delete "${deleting?.originalName}" permanently from the server?`}
+        message={`Delete "${deleting?.originalName}" permanently from the server?${deleting?.inUse ? ' It is used by a product and will be removed from it.' : ''}`}
         confirmText="Delete Image"
+        isLoading={isDeleting}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmBulk}
+        onClose={() => setConfirmBulk(false)}
+        onConfirm={handleBulkDelete}
+        title="Delete Images"
+        message={`Permanently delete ${selectedCount} image(s) from the server? Images used by products will be removed from those products. This cannot be undone.`}
+        confirmText={`Delete ${selectedCount} image(s)`}
         isLoading={isDeleting}
       />
     </div>

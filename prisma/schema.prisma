@@ -16,6 +16,7 @@ enum AdminRole {
   ADMIN         // Full content + orders + reports; cannot manage admin users
   MANAGER       // Orders, customers, inventory, reports; no content editing; no settings
   STAFF         // Orders + customers (read/update only); no reports; no content
+  SEO_MANAGER   // Blogs only (create/edit/publish) + blog image upload; nothing else
 }
 
 model AdminUser {
@@ -394,4 +395,34 @@ model MediaAsset {
   uploadedBy   String   // AdminUser.id
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// ============================================================
+// BLOGS (SEO content)
+// ============================================================
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Blog {
+  id              String     @id @default(uuid())
+  slug            String     @unique
+  title           String
+  excerpt         String?
+  coverImage      String?
+  coverImageAlt   String?
+  content         String     // Sanitized HTML from the rich text editor
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[]   // Rendered as <meta name="keywords"> on the storefront
+  status          BlogStatus @default(DRAFT)
+  publishedAt     DateTime?
+  authorId        String?    // AdminUser.id
+  authorName      String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([status, publishedAt])
 }

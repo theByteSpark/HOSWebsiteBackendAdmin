@@ -200,12 +200,18 @@ export const uploadMedia = async (req: AuthenticatedRequest, res: Response) => {
 
 // URLs of every image currently referenced by a product or category.
 async function getUsedMediaUrls(): Promise<Set<string>> {
-  const [productImages, variantImages, categories] = await Promise.all([
+  const [productImages, variantImages, categories, blogs] = await Promise.all([
     prisma.productImage.findMany({ select: { url: true } }),
     prisma.variantImage.findMany({ select: { url: true } }),
     prisma.productCategory.findMany({ select: { image: true, bannerImage: true } }),
+    prisma.blog.findMany({ select: { coverImage: true, content: true } }),
   ]);
   const used = new Set<string>();
+  blogs.forEach((b) => {
+    if (b.coverImage) used.add(b.coverImage);
+    // inline images inside the article body
+    for (const m of b.content.matchAll(/<img[^>]+src="([^"]+)"/g)) used.add(m[1]);
+  });
   productImages.forEach((i) => used.add(i.url));
   variantImages.forEach((i) => used.add(i.url));
   categories.forEach((c) => {
@@ -267,7 +273,7 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
 
     const used = await getUsedMediaUrls();
     if (used.has(asset.url)) {
-      return sendError(res, 'This image is used by a product or category. Remove it there first.', 409);
+      return sendError(res, 'This image is used by a product, category or blog. Remove it there first.', 409);
     }
 
     if (fs.existsSync(asset.path)) {
@@ -288,3 +294,107 @@ export const deleteMediaAsset = async (req: AuthenticatedRequest, res: Response)
     return sendError(res, 'Failed to delete media asset', 500, error);
   }
 };
+
+// ─── Bulk delete media assets ────────────────────────────────────────────────
+// Body: { ids: string[] }  — delete the selected images
+//   or: { all: true, folder?, search?, unused? } — delete every image matching the filter
+// Images still used by products/categories are detached first, then removed.
+
+const BULK_CHUNK = 200;
+
+export const bulkDeleteMedia = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { ids, all, folder, search, unused } = req.body as {
+      ids?: string[];
+      all?: boolean;
+      folder?: string;
+      search?: string;
+      unused?: boolean;
+    };
+
+    let assets: { id: string; url: string; path: string }[];
+    if (all === true) {
+      const where: any = {};
+      if (folder) where.folder = folder;
+      if (search) {
+        where.OR = [
+          { originalName: { contains: search, mode: 'insensitive' } },
+          { altText: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+      if (unused) {
+        const used = await getUsedMediaUrls();
+        where.url = { notIn: Array.from(used) };
+      }
+      assets = await prisma.mediaAsset.findMany({ where, select: { id: true, url: true, path: true } });
+    } else if (Array.isArray(ids) && ids.length > 0) {
+      assets = await prisma.mediaAsset.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, url: true, path: true },
+      });
+    } else {
+      return sendError(res, 'Provide ids or all: true', 400);
+    }
+
+    let deleted = 0;
+    for (let i = 0; i < assets.length; i += BULK_CHUNK) {
+      const chunk = assets.slice(i, i + BULK_CHUNK);
+      const urls = chunk.map((a) => a.url);
+
+      // Detach from products and categories so nothing points at a missing file
+      await prisma.$transaction([
+        prisma.productImage.deleteMany({ where: { url: { in: urls } } }),
+        prisma.variantImage.deleteMany({ where: { url: { in: urls } } }),
+        prisma.productCategory.updateMany({ where: { image: { in: urls } }, data: { image: null } }),
+        prisma.productCategory.updateMany({ where: { bannerImage: { in: urls } }, data: { bannerImage: null } }),
+        prisma.blog.updateMany({ where: { coverImage: { in: urls } }, data: { coverImage: null } }),
+        prisma.mediaAsset.deleteMany({ where: { id: { in: chunk.map((a) => a.id) } } }),
+      ]);
+
+      for (const a of chunk) {
+        for (const p of [a.path, thumbPathFor(a.path)]) {
+          try {
+            if (fs.existsSync(p)) fs.unlinkSync(p);
+          } catch (err) {
+            console.error('Failed to remove file', p, err);
+          }
+        }
+      }
+      deleted += chunk.length;
+    }
+
+    return sendSuccess(res, { deleted }, `${deleted} image(s) deleted`);
+  } catch (error) {
+    return sendError(res, 'Failed to delete images', 500, error);
+  }
+};
+
+// Removes library records and files for the given URLs, skipping any image that
+// is still referenced by another product or category. Never throws.
+export async function removeUnusedMediaByUrls(urls: string[]): Promise<number> {
+  try {
+    if (urls.length === 0) return 0;
+    const used = await getUsedMediaUrls();
+    const candidates = await prisma.mediaAsset.findMany({
+      where: { url: { in: urls } },
+      select: { id: true, url: true, path: true },
+    });
+    const toDelete = candidates.filter((a) => !used.has(a.url));
+    if (toDelete.length === 0) return 0;
+
+    await prisma.mediaAsset.deleteMany({ where: { id: { in: toDelete.map((a) => a.id) } } });
+    for (const a of toDelete) {
+      for (const p of [a.path, thumbPathFor(a.path)]) {
+        try {
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        } catch (err) {
+          console.error('Failed to remove file', p, err);
+        }
+      }
+    }
+    return toDelete.length;
+  } catch (err) {
+    console.error('removeUnusedMediaByUrls failed:', err);
+    return 0;
+  }
+}

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { removeUnusedMediaByUrls } from '../media/media.controller';
 import { prisma } from '../../config/db';
 import { generateSlug } from '../../utils/slug';
 import { sendSuccess, sendError } from '../../utils/response';
@@ -109,6 +110,15 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 };
 
+// Column limits (see schema.prisma): Decimal(6,2) weight, Decimal(6,3) carat, Decimal(10,2) price.
+function checkNumericRanges(body: any): string | null {
+  const over = (v: any, max: number) => v !== undefined && v !== null && v !== '' && Number(v) > max;
+  if (over(body.netWeightGrams, 9999.99)) return 'Product weight must be 9999.99 g or less.';
+  if (over(body.totalDiamondCt, 999.999)) return 'Total diamond weight must be 999.999 ct or less.';
+  if (over(body.price, 99999999.99)) return 'Price is too large.';
+  return null;
+}
+
 export const createProduct = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const {
@@ -134,6 +144,9 @@ export const createProduct = async (req: AuthenticatedRequest, res: Response) =>
       seo,
       initialStock = 0,
     } = req.body;
+
+    const rangeError = checkNumericRanges(req.body);
+    if (rangeError) return sendError(res, rangeError, 400);
 
     // The category is derived from the subcategory when it isn't sent.
     let categoryId: string | undefined = bodyCategoryId || undefined;
@@ -275,6 +288,9 @@ export const updateProduct = async (req: AuthenticatedRequest, res: Response) =>
     if (!existing || existing.deletedAt) {
       return sendError(res, 'Product not found', 404);
     }
+
+    const rangeError = checkNumericRanges(req.body);
+    if (rangeError) return sendError(res, rangeError, 400);
 
     // The category is derived from the subcategory when it isn't sent.
     let categoryId: string | undefined = bodyCategoryId || undefined;
@@ -424,11 +440,25 @@ export const deleteProduct = async (req: AuthenticatedRequest, res: Response) =>
       return sendError(res, 'Product not found', 404);
     }
 
-    // Soft delete product
-    await prisma.product.update({
-      where: { id },
-      data: { deletedAt: new Date(), isPublished: false },
-    });
+    // Collect the product's images before removing them
+    const [galleryImages, legacyImages] = await Promise.all([
+      prisma.productImage.findMany({ where: { productId: id }, select: { url: true } }),
+      prisma.variantImage.findMany({ where: { variant: { productId: id } }, select: { url: true } }),
+    ]);
+    const imageUrls = Array.from(new Set([...galleryImages, ...legacyImages].map((i) => i.url)));
+
+    // Soft delete product and detach its images
+    await prisma.$transaction([
+      prisma.product.update({
+        where: { id },
+        data: { deletedAt: new Date(), isPublished: false },
+      }),
+      prisma.productImage.deleteMany({ where: { productId: id } }),
+      prisma.variantImage.deleteMany({ where: { variant: { productId: id } } }),
+    ]);
+
+    // Delete the files too, unless another product still uses the same image
+    await removeUnusedMediaByUrls(imageUrls);
 
 
     return sendSuccess(res, null, 'Product deleted successfully');

@@ -5,6 +5,8 @@ import categoriesRoutes from './modules/categories/categories.routes';
 import productsRoutes from './modules/products/products.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import mediaRoutes from './modules/media/media.routes';
+import instagramRoutes from './modules/instagram/instagram.routes';
+import blogsRoutes from './modules/blogs/blogs.routes';
 
 const apiRouter = Router();
 
@@ -24,5 +26,11 @@ apiRouter.use('/products', productsRoutes);
 // Notifications, Media
 apiRouter.use('/notifications', notificationsRoutes);
 apiRouter.use('/media', mediaRoutes);
+
+// Storefront Instagram feed
+apiRouter.use('/instagram', instagramRoutes);
+
+// Blogs (SEO content): public read + SEO_MANAGER admin
+apiRouter.use('/blogs', blogsRoutes);
 
 export default apiRouter;

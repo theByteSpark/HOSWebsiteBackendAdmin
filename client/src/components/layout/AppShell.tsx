@@ -43,7 +43,9 @@ export const AppShell: React.FC = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  const navGroups: NavGroup[] = [
+  const isSeoOnly = user?.role === 'SEO_MANAGER';
+
+  const commerceGroups: NavGroup[] = [
     {
       key: 'commerce',
       label: 'COMMERCE CONTENT',
@@ -55,6 +57,11 @@ export const AppShell: React.FC = () => {
       ],
     },
     {
+      key: 'seo',
+      label: 'SEO CONTENT',
+      items: [{ label: 'Blogs', to: '/blogs', icon: BookOpen }],
+    },
+    {
       key: 'admin',
       label: 'ADMINISTRATION & AUDIT',
       items: [
@@ -63,15 +70,23 @@ export const AppShell: React.FC = () => {
     },
   ];
 
+  // SEO managers only ever see the blog section
+  const navGroups: NavGroup[] = isSeoOnly
+    ? [{ key: 'seo', label: 'SEO CONTENT', items: [{ label: 'Blogs', to: '/blogs', icon: BookOpen }] }]
+    : commerceGroups;
+
   const toggleGroup = (key: string) => {
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const mobilePrimaryItems = [
-    { label: 'Categories', to: '/categories', icon: FolderTree },
-    { label: 'Products', to: '/products', icon: Gem },
-    { label: 'Users', to: '/settings?tab=users', icon: Users },
-  ];
+  const mobilePrimaryItems = isSeoOnly
+    ? [{ label: 'Blogs', to: '/blogs', icon: BookOpen }]
+    : [
+        { label: 'Categories', to: '/categories', icon: FolderTree },
+        { label: 'Products', to: '/products', icon: Gem },
+        { label: 'Blogs', to: '/blogs', icon: BookOpen },
+        { label: 'Users', to: '/settings?tab=users', icon: Users },
+      ];
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8f9] lg:flex-row">
@@ -87,7 +102,7 @@ export const AppShell: React.FC = () => {
               <p className="text-sm font-bold tracking-tight text-graphite-900 truncate">HOS</p>
               <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </div>
-            <p className="text-[11px] font-medium text-graphite-400 truncate">Visual Content Manager</p>
+            <p className="text-[11px] font-medium text-graphite-400 truncate">{isSeoOnly ? 'SEO Content Manager' : 'Visual Content Manager'}</p>
           </div>
         </div>
 

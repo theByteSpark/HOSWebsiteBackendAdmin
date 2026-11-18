@@ -34,3 +34,11 @@ export const requireStaff = requireRole([
   AdminRole.MANAGER,
   AdminRole.STAFF,
 ]);
+
+// Blog authoring: SEO managers plus the two top roles. SEO_MANAGER is deliberately
+// absent from requireManager / requireStaff, so it can never reach any other module.
+export const requireBlogEditor = requireRole([
+  AdminRole.SUPER_ADMIN,
+  AdminRole.ADMIN,
+  AdminRole.SEO_MANAGER,
+]);

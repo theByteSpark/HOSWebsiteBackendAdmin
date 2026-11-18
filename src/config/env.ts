@@ -15,5 +15,9 @@ export const env = {
     ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim().replace(/^["']|["']$/g, '').replace(/\/+$/, '')).filter(Boolean)
     : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
   UPLOAD_DIR: path.resolve(process.env.UPLOAD_DIR || './uploads'),
+  // Long-lived Instagram access token for @houseofseya.in (see .env.example)
+  INSTAGRAM_ACCESS_TOKEN: process.env.INSTAGRAM_ACCESS_TOKEN || '',
+  // Public storefront origin; used for blog URLs in the generated sitemap
+  SITE_URL: (process.env.SITE_URL || 'https://www.houseofseya.com').replace(/\/+$/, ''),
   PUBLIC_MEDIA_URL: process.env.PUBLIC_MEDIA_URL || 'http://localhost:4000/uploads',
 };
